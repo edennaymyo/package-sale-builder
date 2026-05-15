@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
+import { findCatalogProductByShortCode } from './productCatalog'
 
 export interface ProductOption {
   id: string
@@ -149,10 +150,34 @@ export function getPackageProducts(pkg: Package): string[] {
 const STORAGE_KEY = 'modern-science-packages'
 const API_ENDPOINT = '/api/packages'
 
+function normalizeProduct(product: ProductOption): ProductOption {
+  const catalogProduct = findCatalogProductByShortCode(product.shortCode)
+  return catalogProduct ? {
+    ...product,
+    name: catalogProduct.name,
+    reamsPerBox: catalogProduct.reamsPerBox,
+  } : product
+}
+
+function normalizePackage(pkg: Package): Package {
+  return {
+    ...pkg,
+    productLines: pkg.productLines.map(line => ({
+      ...line,
+      fixedProduct: line.fixedProduct ? normalizeProduct(line.fixedProduct) : undefined,
+      orOptions: line.orOptions?.map(normalizeProduct),
+    })),
+  }
+}
+
+function normalizePackages(packages: Package[]): Package[] {
+  return packages.map(normalizePackage)
+}
+
 export function loadPackages(): Package[] {
   try {
     const stored = localStorage.getItem(STORAGE_KEY)
-    return stored ? JSON.parse(stored) : []
+    return stored ? normalizePackages(JSON.parse(stored)) : []
   } catch {
     return []
   }
@@ -202,7 +227,7 @@ async function requestPackages(): Promise<Package[]> {
     throw new Error('Failed to load packages')
   }
 
-  return response.json()
+  return normalizePackages(await response.json())
 }
 
 async function persistPackages(packages: Package[]): Promise<Package[]> {

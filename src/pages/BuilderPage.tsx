@@ -489,11 +489,25 @@ interface ProductInputProps {
 }
 
 function ProductInput({ product, onChange, error, onRemove }: ProductInputProps) {
-  const hasCatalogProduct = PRODUCT_CATALOG.some(item => item.name === product.name)
-  const handleProductChange = (name: string) => {
+  const [query, setQuery] = useState(product.name)
+  const [showHints, setShowHints] = useState(false)
+
+  useEffect(() => {
+    setQuery(product.name)
+  }, [product.name])
+
+  const matchingProducts = PRODUCT_CATALOG.filter(item => {
+    const search = query.trim().toLowerCase()
+    if (!search) return true
+    return item.name.toLowerCase().includes(search) || item.shortCode.toLowerCase().includes(search)
+  }).slice(0, 8)
+
+  const selectProduct = (name: string) => {
     const catalogProduct = findCatalogProduct(name)
+    setQuery(catalogProduct?.name || name)
+    setShowHints(false)
     onChange({
-      name,
+      name: catalogProduct?.name || name,
       shortCode: catalogProduct?.shortCode || '',
       reamsPerBox: catalogProduct?.reamsPerBox,
     })
@@ -501,36 +515,63 @@ function ProductInput({ product, onChange, error, onRemove }: ProductInputProps)
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
-      <div className="lg:col-span-5">
-        <select
-          value={product.name}
-          onChange={e => handleProductChange(e.target.value)}
+      <div className="lg:col-span-6 relative">
+        <input
+          type="text"
+          value={query}
+          onFocus={() => setShowHints(true)}
+          onChange={e => {
+            const value = e.target.value
+            const catalogProduct = findCatalogProduct(value)
+            setQuery(value)
+            setShowHints(true)
+            onChange({
+              name: catalogProduct?.name || value,
+              shortCode: catalogProduct?.shortCode || '',
+              reamsPerBox: catalogProduct?.reamsPerBox,
+            })
+          }}
           className={cn(
             'w-full px-3 py-2 text-sm rounded-lg border bg-background focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none transition-all',
             error && 'border-red-500'
           )}
-        >
-          <option value="">Select product</option>
-          {product.name && !hasCatalogProduct && (
-            <option value={product.name}>{product.name}</option>
-          )}
-          {PRODUCT_CATALOG.map(item => (
-            <option key={item.shortCode} value={item.name}>
-              {item.name} - {item.shortCode} - {item.reamsPerBox} ream/box
-            </option>
-          ))}
-        </select>
-        {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
-      </div>
-
-      <div className="lg:col-span-2">
-        <input
-          type="text"
-          value={product.shortCode || ''}
-          onChange={e => onChange({ shortCode: e.target.value })}
-          className="w-full px-3 py-2 text-sm rounded-lg border bg-muted/50 focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none transition-all"
-          placeholder="Short code"
+          placeholder="Search product name or short code"
         />
+        {showHints && matchingProducts.length > 0 && (
+          <div className="absolute z-20 mt-1 max-h-64 w-full overflow-auto rounded-lg border bg-white shadow-lg">
+            {matchingProducts.map(item => (
+              <button
+                key={item.shortCode}
+                type="button"
+                onMouseDown={event => {
+                  event.preventDefault()
+                  selectProduct(item.name)
+                }}
+                className="w-full px-3 py-2 text-left text-sm hover:bg-gold/10 focus:bg-gold/10 focus:outline-none"
+              >
+                <span className="block font-medium text-navy">{item.name}</span>
+                <span className="block text-xs text-muted-foreground">
+                  {item.shortCode} | {item.reamsPerBox} ream/box
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
+        {showHints && query && matchingProducts.length === 0 && (
+          <div className="absolute z-20 mt-1 w-full rounded-lg border bg-white px-3 py-2 text-sm text-muted-foreground shadow-lg">
+            No matching product
+          </div>
+        )}
+        {showHints && (
+          <button
+            type="button"
+            aria-label="Close product hints"
+            className="fixed inset-0 z-10 cursor-default bg-transparent"
+            onClick={() => setShowHints(false)}
+            tabIndex={-1}
+          />
+        )}
+        {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
       </div>
 
       <div className="lg:col-span-2">
@@ -558,8 +599,8 @@ function ProductInput({ product, onChange, error, onRemove }: ProductInputProps)
         />
       </div>
 
-      <div className="lg:col-span-2 flex items-start gap-2">
-        <div className="flex-1 space-y-2">
+      <div className="lg:col-span-3 flex items-start gap-2">
+        <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
           <input
             type="number"
             value={product.originalPrice || ''}

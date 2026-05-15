@@ -5,35 +5,39 @@ export interface CatalogProduct {
 }
 
 export const PRODUCT_CATALOG: CatalogProduct[] = [
-  { name: '100gsm A4 Paper One', shortCode: 'PO-A4-100', reamsPerBox: 4 },
-  { name: '70gsm A3 Copy & Laser', shortCode: 'CL-A3-70', reamsPerBox: 5 },
-  { name: '70gsm A3 Double A', shortCode: 'DA-A3-70', reamsPerBox: 5 },
-  { name: '70gsm A3 Paper One', shortCode: 'PO-A3-70', reamsPerBox: 5 },
-  { name: '70gsm A4 ACE', shortCode: 'AC-A4-70', reamsPerBox: 5 },
-  { name: '70gsm A4 Alcott (Blue)', shortCode: 'AL-A4-70', reamsPerBox: 5 },
-  { name: '70gsm A4 Double A', shortCode: 'DA-A4-70', reamsPerBox: 5 },
-  { name: '70gsm A4 Go On', shortCode: 'GO-A4-70', reamsPerBox: 5 },
-  { name: '70gsm A4 Paper One', shortCode: 'PO-A4-70', reamsPerBox: 5 },
-  { name: '70gsm A4 Quality', shortCode: 'QU-A4-70', reamsPerBox: 5 },
-  { name: '70gsm A4 Smartist', shortCode: 'SM-A4-70', reamsPerBox: 5 },
-  { name: '70gsm A4 ZAP Premium', shortCode: 'ZP-A4-70', reamsPerBox: 5 },
-  { name: '70gsm A5 Alcott', shortCode: 'AL-A5-70', reamsPerBox: 10 },
-  { name: '70gsm A5 Paper One', shortCode: 'PO-A5-70', reamsPerBox: 10 },
-  { name: '70gsm B4 Double A', shortCode: 'DA-B4-70', reamsPerBox: 5 },
-  { name: '70gsm B4 Paper One', shortCode: 'PO-B4-70', reamsPerBox: 5 },
-  { name: '70gsm F14 Legal Smartist', shortCode: 'SM-LG-70', reamsPerBox: 5 },
-  { name: '70gsm Legal Excellent', shortCode: 'EX-LG-70', reamsPerBox: 5 },
-  { name: '70gsm Legal F14 Alcott', shortCode: 'AL-LG-70', reamsPerBox: 5 },
-  { name: '70gsm Legal F14 Double', shortCode: 'DA-LG-70', reamsPerBox: 5 },
-  { name: '75gsm Legal Paper One 5R/box', shortCode: 'PO-LG-75', reamsPerBox: 5 },
-  { name: '80gsm A3 Double A', shortCode: 'DA-A3-80', reamsPerBox: 5 },
-  { name: '80gsm A3 Paper One', shortCode: 'PO-A3-80', reamsPerBox: 5 },
-  { name: '80gsm A4 Double A', shortCode: 'DA-A4-80', reamsPerBox: 5 },
-  { name: '80gsm A4 Paper One (All Purpose)', shortCode: 'PO-AP-A4-80', reamsPerBox: 5 },
-  { name: '80gsm A4 Paper One (Digital)', shortCode: 'PO-DG-A4-80', reamsPerBox: 5 },
-  { name: '80gsm Legal Double A', shortCode: 'DA-LG-80', reamsPerBox: 5 },
+  { name: 'Paper One A4 100g', shortCode: 'PO-A4-100', reamsPerBox: 4 },
+  { name: 'Copy & Laser A3 70g', shortCode: 'CL-A3-70', reamsPerBox: 5 },
+  { name: 'Double A A3 70g', shortCode: 'DA-A3-70', reamsPerBox: 5 },
+  { name: 'Paper One A3 70g', shortCode: 'PO-A3-70', reamsPerBox: 5 },
+  { name: 'ACE A4 70g', shortCode: 'AC-A4-70', reamsPerBox: 5 },
+  { name: 'Alcott A4 70g Blue', shortCode: 'AL-A4-70', reamsPerBox: 5 },
+  { name: 'Double A A4 70g', shortCode: 'DA-A4-70', reamsPerBox: 5 },
+  { name: 'Go On A4 70g', shortCode: 'GO-A4-70', reamsPerBox: 5 },
+  { name: 'Paper One A4 70g', shortCode: 'PO-A4-70', reamsPerBox: 5 },
+  { name: 'Quality A4 70g', shortCode: 'QU-A4-70', reamsPerBox: 5 },
+  { name: 'Smartist A4 70g', shortCode: 'SM-A4-70', reamsPerBox: 5 },
+  { name: 'ZAP Premium A4 70g', shortCode: 'ZP-A4-70', reamsPerBox: 5 },
+  { name: 'Alcott A5 70g', shortCode: 'AL-A5-70', reamsPerBox: 10 },
+  { name: 'Paper One A5 70g', shortCode: 'PO-A5-70', reamsPerBox: 10 },
+  { name: 'Double A B4 70g', shortCode: 'DA-B4-70', reamsPerBox: 5 },
+  { name: 'Paper One B4 70g', shortCode: 'PO-B4-70', reamsPerBox: 5 },
+  { name: 'Smartist F14 Legal 70g', shortCode: 'SM-LG-70', reamsPerBox: 5 },
+  { name: 'Excellent Legal 70g', shortCode: 'EX-LG-70', reamsPerBox: 5 },
+  { name: 'Alcott Legal F14 70g', shortCode: 'AL-LG-70', reamsPerBox: 5 },
+  { name: 'Double A Legal F14 70g', shortCode: 'DA-LG-70', reamsPerBox: 5 },
+  { name: 'Paper One Legal 75g 5R/box', shortCode: 'PO-LG-75', reamsPerBox: 5 },
+  { name: 'Double A A3 80g', shortCode: 'DA-A3-80', reamsPerBox: 5 },
+  { name: 'Paper One A3 80g', shortCode: 'PO-A3-80', reamsPerBox: 5 },
+  { name: 'Double A A4 80g', shortCode: 'DA-A4-80', reamsPerBox: 5 },
+  { name: 'Paper One A4 80g All Purpose', shortCode: 'PO-AP-A4-80', reamsPerBox: 5 },
+  { name: 'Paper One A4 80g Digital', shortCode: 'PO-DG-A4-80', reamsPerBox: 5 },
+  { name: 'Double A Legal 80g', shortCode: 'DA-LG-80', reamsPerBox: 5 },
 ]
 
 export function findCatalogProduct(name: string): CatalogProduct | undefined {
-  return PRODUCT_CATALOG.find(product => product.name === name)
+  return PRODUCT_CATALOG.find(product => product.name === name || product.shortCode === name)
+}
+
+export function findCatalogProductByShortCode(shortCode?: string): CatalogProduct | undefined {
+  return shortCode ? PRODUCT_CATALOG.find(product => product.shortCode === shortCode) : undefined
 }
