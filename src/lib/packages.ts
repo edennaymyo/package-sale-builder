@@ -147,6 +147,7 @@ export function getPackageProducts(pkg: Package): string[] {
 }
 
 const STORAGE_KEY = 'modern-science-packages'
+const API_ENDPOINT = '/api/packages'
 
 export function loadPackages(): Package[] {
   try {
@@ -189,4 +190,71 @@ export function deletePackage(id: string): Package[] {
 
 export function getPackageById(id: string): Package | undefined {
   return loadPackages().find(p => p.id === id)
+}
+
+async function requestPackages(): Promise<Package[]> {
+  const response = await fetch(API_ENDPOINT, {
+    cache: 'no-store',
+    credentials: 'same-origin',
+  })
+
+  if (!response.ok) {
+    throw new Error('Failed to load packages')
+  }
+
+  return response.json()
+}
+
+async function persistPackages(packages: Package[]): Promise<Package[]> {
+  const response = await fetch(API_ENDPOINT, {
+    method: 'PUT',
+    headers: {
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify(packages),
+    credentials: 'same-origin',
+  })
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => null)
+    throw new Error(data?.error || 'Failed to save packages')
+  }
+
+  savePackages(packages)
+  return response.json()
+}
+
+export async function fetchPackages(): Promise<Package[]> {
+  try {
+    const packages = await requestPackages()
+    savePackages(packages)
+    return packages
+  } catch {
+    return loadPackages()
+  }
+}
+
+export async function fetchPackageById(id: string): Promise<Package | undefined> {
+  return (await fetchPackages()).find(p => p.id === id)
+}
+
+export async function addPackageRemote(pkg: Package): Promise<Package[]> {
+  const packages = await fetchPackages()
+  if (packages.length >= 20) {
+    throw new Error('Maximum of 20 packages allowed')
+  }
+
+  const updatedPackages = [...packages, pkg]
+  return persistPackages(updatedPackages)
+}
+
+export async function updatePackageRemote(pkg: Package): Promise<Package[]> {
+  const packages = await fetchPackages()
+  const index = packages.findIndex(p => p.id === pkg.id)
+  const updatedPackage = { ...pkg, updatedAt: new Date().toISOString() }
+  const updatedPackages = index === -1
+    ? [...packages, updatedPackage]
+    : packages.map(p => p.id === pkg.id ? updatedPackage : p)
+
+  return persistPackages(updatedPackages)
 }

@@ -18,10 +18,10 @@ import {
   createEmptyPackage,
   createEmptyProductLine,
   createEmptyProduct,
-  loadPackages,
-  addPackage,
-  updatePackage,
-  getPackageById,
+  fetchPackageById,
+  fetchPackages,
+  addPackageRemote,
+  updatePackageRemote,
   calculatePackageTotals,
 } from '@/lib/packages'
 
@@ -34,15 +34,23 @@ export function BuilderPage() {
   const [saved, setSaved] = useState(false)
 
   useEffect(() => {
+    let active = true
+
     if (id) {
-      const existing = getPackageById(id)
-      if (existing) {
-        setPkg(existing)
-      } else {
-        navigate('/builder')
-      }
+      fetchPackageById(id).then(existing => {
+        if (!active) return
+        if (existing) {
+          setPkg(existing)
+        } else {
+          navigate('/builder')
+        }
+      })
     } else {
       setPkg(createEmptyPackage())
+    }
+
+    return () => {
+      active = false
     }
   }, [id, navigate])
 
@@ -81,12 +89,12 @@ export function BuilderPage() {
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!validatePackage()) return
     
     setSaving(true)
     try {
-      const packages = loadPackages()
+      const packages = await fetchPackages()
       if (!id && packages.length >= 20) {
         setErrors({ save: 'Maximum of 20 packages allowed. Please delete some packages first.' })
         setSaving(false)
@@ -94,9 +102,9 @@ export function BuilderPage() {
       }
       
       if (id) {
-        updatePackage(pkg)
+        await updatePackageRemote(pkg)
       } else {
-        addPackage(pkg)
+        await addPackageRemote(pkg)
       }
       
       setSaved(true)

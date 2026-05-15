@@ -16,7 +16,7 @@ import {
   Package,
   ProductLine,
   ProductOption,
-  getPackageById,
+  fetchPackageById,
   calculatePackageTotals,
   calculateLineTotal,
 } from '@/lib/packages'
@@ -38,21 +38,28 @@ export function PackageDetailPage() {
   const cardRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    let active = true
+
     if (id) {
-      const found = getPackageById(id)
-      if (found) {
-        setPkg(found)
-        // Initialize selections with first option of each OR group
-        const initialSelections: Record<string, string> = {}
-        found.productLines.forEach(line => {
-          if (line.type === 'or-group' && line.orOptions?.[0]) {
-            initialSelections[line.id] = line.orOptions[0].id
-          }
-        })
-        setSelections(initialSelections)
-      } else {
-        navigate('/explore')
-      }
+      fetchPackageById(id).then(found => {
+        if (!active) return
+        if (found) {
+          setPkg(found)
+          const initialSelections: Record<string, string> = {}
+          found.productLines.forEach(line => {
+            if (line.type === 'or-group' && line.orOptions?.[0]) {
+              initialSelections[line.id] = line.orOptions[0].id
+            }
+          })
+          setSelections(initialSelections)
+        } else {
+          navigate('/explore')
+        }
+      })
+    }
+
+    return () => {
+      active = false
     }
   }, [id, navigate])
 

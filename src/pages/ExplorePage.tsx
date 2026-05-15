@@ -1,33 +1,26 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { 
   Search, 
-  Plus, 
   Package as PackageIcon, 
   Calendar, 
   Percent,
-  Edit,
-  Trash2,
   Eye,
-  AlertCircle
 } from 'lucide-react'
 import { cn, formatCurrency, formatPercent } from '@/lib/utils'
 import {
   Package,
-  loadPackages,
-  deletePackage,
+  fetchPackages,
   calculatePackageTotals,
   getPackageProducts,
 } from '@/lib/packages'
 
 export function ExplorePage() {
-  const navigate = useNavigate()
   const [packages, setPackages] = useState<Package[]>([])
   const [searchQuery, setSearchQuery] = useState('')
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
 
   useEffect(() => {
-    setPackages(loadPackages())
+    fetchPackages().then(setPackages)
   }, [])
 
   const filteredPackages = useMemo(() => {
@@ -45,12 +38,6 @@ export function ExplorePage() {
     })
   }, [packages, searchQuery])
 
-  const handleDelete = (id: string) => {
-    const updatedPackages = deletePackage(id)
-    setPackages(updatedPackages)
-    setDeleteConfirm(null)
-  }
-
   const isPackageActive = (pkg: Package): boolean => {
     const today = new Date().toISOString().split('T')[0]
     return pkg.validFrom <= today && pkg.validTo >= today
@@ -67,19 +54,6 @@ export function ExplorePage() {
           </p>
         </div>
         
-        <Link
-          to="/builder"
-          className={cn(
-            'flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-medium transition-all',
-            packages.length >= 20
-              ? 'bg-muted text-muted-foreground cursor-not-allowed'
-              : 'bg-gold hover:bg-gold-dark text-navy'
-          )}
-          onClick={e => packages.length >= 20 && e.preventDefault()}
-        >
-          <Plus className="w-4 h-4" />
-          Create Package
-        </Link>
       </div>
 
       {/* Search */}
@@ -204,44 +178,8 @@ export function ExplorePage() {
                       <Eye className="w-4 h-4" />
                       View
                     </Link>
-                    <button
-                      onClick={() => navigate(`/builder/${pkg.id}`)}
-                      className="p-2 text-navy hover:bg-muted rounded-lg transition-colors"
-                    >
-                      <Edit className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => setDeleteConfirm(pkg.id)}
-                      className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
                   </div>
                 </div>
-
-                {/* Delete Confirmation */}
-                {deleteConfirm === pkg.id && (
-                  <div className="p-4 bg-red-50 border-t border-red-100">
-                    <p className="text-sm text-red-700 mb-3 flex items-center gap-2">
-                      <AlertCircle className="w-4 h-4" />
-                      Delete this package?
-                    </p>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleDelete(pkg.id)}
-                        className="flex-1 px-3 py-1.5 bg-red-500 text-white text-sm font-medium rounded-lg hover:bg-red-600 transition-colors"
-                      >
-                        Delete
-                      </button>
-                      <button
-                        onClick={() => setDeleteConfirm(null)}
-                        className="flex-1 px-3 py-1.5 bg-white text-red-500 text-sm font-medium rounded-lg border border-red-200 hover:bg-red-50 transition-colors"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                )}
               </div>
             )
           })}
