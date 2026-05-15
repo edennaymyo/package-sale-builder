@@ -1,2 +1,2 @@
 # package-sale-builder
-Modern Science packge sale
+Modern Science package sale
