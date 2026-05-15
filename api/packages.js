@@ -27,11 +27,11 @@ function isAuthorized(req) {
 }
 
 async function kvRequest(command) {
-  const url = process.env.KV_REST_API_URL
-  const token = process.env.KV_REST_API_TOKEN
+  const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL
+  const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN
 
   if (!url || !token) {
-    throw new Error('Missing KV_REST_API_URL or KV_REST_API_TOKEN')
+    throw new Error('Missing KV_REST_API_URL/KV_REST_API_TOKEN or UPSTASH_REDIS_REST_URL/UPSTASH_REDIS_REST_TOKEN')
   }
 
   const response = await fetch(`${url}/${command}`, {
