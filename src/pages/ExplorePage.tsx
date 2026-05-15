@@ -204,17 +204,10 @@ export function ExplorePage() {
             </>
           ) : (
             <>
-              <h3 className="text-lg font-semibold text-navy mb-2">No packages yet</h3>
-              <p className="text-muted-foreground mb-4">
-                Create your first promotional package to get started
+              <h3 className="text-lg font-semibold text-navy mb-2">No packages available</h3>
+              <p className="text-muted-foreground">
+                Published promotional packages will appear here.
               </p>
-              <Link
-                to="/builder"
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-gold hover:bg-gold-dark text-navy font-medium rounded-lg transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                Create Package
-              </Link>
             </>
           )}
         </div>
