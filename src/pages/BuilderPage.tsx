@@ -9,7 +9,7 @@ import {
   GripVertical,
   AlertCircle
 } from 'lucide-react'
-import { cn, formatCurrency, formatPercent } from '@/lib/utils'
+import { cn, formatCurrency, formatPercent, parseCurrencyAmount } from '@/lib/utils'
 import {
   Package,
   ProductLine,
@@ -515,14 +515,14 @@ function ProductInput({ product, onChange, error, onRemove }: ProductInputProps)
           <input
             type="number"
             value={product.originalPrice || ''}
-            onChange={e => onChange({ originalPrice: parseFloat(e.target.value) || 0 })}
+            onChange={e => onChange({ originalPrice: parseCurrencyAmount(e.target.value) })}
             placeholder="Original"
             className="w-full px-3 py-2 text-sm rounded-lg border bg-background focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none transition-all"
           />
           <input
             type="number"
             value={product.promoPrice || ''}
-            onChange={e => onChange({ promoPrice: parseFloat(e.target.value) || 0 })}
+            onChange={e => onChange({ promoPrice: parseCurrencyAmount(e.target.value) })}
             placeholder="Promo"
             className="w-full px-3 py-2 text-sm rounded-lg border bg-gold/10 focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none transition-all"
           />

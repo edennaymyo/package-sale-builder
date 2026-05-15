@@ -57,11 +57,20 @@ export function createEmptyPackage(): Package {
   }
 }
 
+function parseAmount(value: number | string): number {
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : 0
+  }
+
+  const parsed = Number(value.replace(/[^\d.-]/g, ''))
+  return Number.isFinite(parsed) ? parsed : 0
+}
+
 export function calculateLineTotal(line: ProductLine, selectedOptionId?: string): { original: number; promo: number } {
   if (line.type === 'fixed' && line.fixedProduct) {
     return {
-      original: line.fixedProduct.qty * line.fixedProduct.originalPrice,
-      promo: line.fixedProduct.qty * line.fixedProduct.promoPrice,
+      original: parseAmount(line.fixedProduct.qty) * parseAmount(line.fixedProduct.originalPrice),
+      promo: parseAmount(line.fixedProduct.qty) * parseAmount(line.fixedProduct.promoPrice),
     }
   }
   
@@ -72,8 +81,8 @@ export function calculateLineTotal(line: ProductLine, selectedOptionId?: string)
     
     if (selected) {
       return {
-        original: selected.qty * selected.originalPrice,
-        promo: selected.qty * selected.promoPrice,
+        original: parseAmount(selected.qty) * parseAmount(selected.originalPrice),
+        promo: parseAmount(selected.qty) * parseAmount(selected.promoPrice),
       }
     }
   }
