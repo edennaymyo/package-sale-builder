@@ -1,0 +1,6 @@
+{
+  "buildCommand": "node .v0/inject-built-with-v0.mjs && vite build",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/" }
+  ]
+}
