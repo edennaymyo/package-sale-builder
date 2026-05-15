@@ -79,7 +79,7 @@ export function PackageDetailPage() {
     if (!pkg) return
     const pkgTotals = calculatePackageTotals(pkg, selections)
     const text = `🎁 ${pkg.name}\n\n` +
-      `💰 Special Price: ฿${formatCurrency(pkgTotals.promoTotal)}\n` +
+      `💰 Special Price: ${formatCurrency(pkgTotals.promoTotal)}\n` +
       `📦 Save ${formatPercent(pkgTotals.discountPercent)}!\n\n` +
       `📅 Valid: ${pkg.validFrom} to ${pkg.validTo}\n\n` +
       `Contact Modern Science Co.,Ltd. for inquiry!`
@@ -253,10 +253,10 @@ export function PackageDetailPage() {
                       </div>
                       <div className="text-right">
                         <p className="text-xs text-muted-foreground line-through">
-                          ฿{formatCurrency(lineTotal.original)}
+                          {formatCurrency(lineTotal.original)}
                         </p>
                         <p className="font-semibold text-gold">
-                          ฿{formatCurrency(lineTotal.promo)}
+                          {formatCurrency(lineTotal.promo)}
                         </p>
                       </div>
                     </div>
@@ -269,13 +269,13 @@ export function PackageDetailPage() {
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-sm text-muted-foreground">Original Price:</span>
                   <span className="line-through text-muted-foreground">
-                    ฿{formatCurrency(totals.originalTotal)}
+                    {formatCurrency(totals.originalTotal)}
                   </span>
                 </div>
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-sm font-medium">Package Price:</span>
                   <span className="text-2xl font-bold text-gold">
-                    ฿{formatCurrency(totals.promoTotal)}
+                    {formatCurrency(totals.promoTotal)}
                   </span>
                 </div>
                 <div className="flex justify-between items-center pt-2 border-t border-navy/10">
@@ -284,7 +284,7 @@ export function PackageDetailPage() {
                     You Save:
                   </span>
                   <span className="text-green-600 font-bold">
-                    ฿{formatCurrency(totals.discountAmount)} ({formatPercent(totals.discountPercent)})
+                    {formatCurrency(totals.discountAmount)} ({formatPercent(totals.discountPercent)})
                   </span>
                 </div>
               </div>
@@ -334,10 +334,10 @@ function ProductLineCard({ line, index, selectedOptionId, onSelectOption }: Prod
           </div>
           <div className="text-right">
             <p className="text-sm text-muted-foreground line-through">
-              ฿{formatCurrency(lineTotal.original)}
+              {formatCurrency(lineTotal.original)}
             </p>
             <p className="font-bold text-gold">
-              ฿{formatCurrency(lineTotal.promo)}
+              {formatCurrency(lineTotal.promo)}
             </p>
           </div>
         </div>
@@ -390,13 +390,13 @@ function ProductLineCard({ line, index, selectedOptionId, onSelectOption }: Prod
                 </div>
                 <div className="text-right">
                   <p className="text-xs text-muted-foreground line-through">
-                    ฿{formatCurrency(optOriginal)}
+                    {formatCurrency(optOriginal)}
                   </p>
                   <p className={cn(
                     'font-bold',
                     isSelected ? 'text-gold' : 'text-muted-foreground'
                   )}>
-                    ฿{formatCurrency(optTotal)}
+                    {formatCurrency(optTotal)}
                   </p>
                 </div>
               </button>

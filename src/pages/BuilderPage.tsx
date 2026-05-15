@@ -439,21 +439,21 @@ export function BuilderPage() {
               <div className="pb-4 border-b border-white/20">
                 <p className="text-white/60 text-sm mb-1">Original Total</p>
                 <p className="text-2xl font-bold">
-                  ฿{formatCurrency(totals.originalTotal)}
+                  {formatCurrency(totals.originalTotal)}
                 </p>
               </div>
               
               <div className="pb-4 border-b border-white/20">
                 <p className="text-white/60 text-sm mb-1">Promotional Price</p>
                 <p className="text-2xl font-bold text-gold">
-                  ฿{formatCurrency(totals.promoTotal)}
+                  {formatCurrency(totals.promoTotal)}
                 </p>
               </div>
               
               <div className="bg-gold/20 rounded-lg p-4">
                 <p className="text-white/80 text-sm mb-1">You Save</p>
                 <p className="text-xl font-bold text-gold">
-                  ฿{formatCurrency(totals.discountAmount)}
+                  {formatCurrency(totals.discountAmount)}
                 </p>
                 <p className="text-sm text-gold/80">
                   ({formatPercent(totals.discountPercent)} off)
@@ -516,14 +516,14 @@ function ProductInput({ product, onChange, error, onRemove }: ProductInputProps)
             type="number"
             value={product.originalPrice || ''}
             onChange={e => onChange({ originalPrice: parseFloat(e.target.value) || 0 })}
-            placeholder="Original ฿"
+            placeholder="Original"
             className="w-full px-3 py-2 text-sm rounded-lg border bg-background focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none transition-all"
           />
           <input
             type="number"
             value={product.promoPrice || ''}
             onChange={e => onChange({ promoPrice: parseFloat(e.target.value) || 0 })}
-            placeholder="Promo ฿"
+            placeholder="Promo"
             className="w-full px-3 py-2 text-sm rounded-lg border bg-gold/10 focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none transition-all"
           />
         </div>

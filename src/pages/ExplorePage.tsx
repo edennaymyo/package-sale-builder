@@ -168,13 +168,13 @@ export function ExplorePage() {
                     <div>
                       <p className="text-xs text-muted-foreground">Original</p>
                       <p className="font-medium line-through text-muted-foreground">
-                        ฿{formatCurrency(totals.originalTotal)}
+                        {formatCurrency(totals.originalTotal)}
                       </p>
                     </div>
                     <div className="text-right">
                       <p className="text-xs text-muted-foreground">Promo Price</p>
                       <p className="font-bold text-lg text-gold">
-                        ฿{formatCurrency(totals.promoTotal)}
+                        {formatCurrency(totals.promoTotal)}
                       </p>
                     </div>
                   </div>
