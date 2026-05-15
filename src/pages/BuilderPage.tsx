@@ -10,6 +10,7 @@ import {
   AlertCircle
 } from 'lucide-react'
 import { cn, formatCurrency, formatPercent, parseCurrencyAmount } from '@/lib/utils'
+import { PRODUCT_CATALOG, findCatalogProduct } from '@/lib/productCatalog'
 import {
   Package,
   ProductLine,
@@ -480,37 +481,76 @@ interface ProductInputProps {
 }
 
 function ProductInput({ product, onChange, error, onRemove }: ProductInputProps) {
+  const hasCatalogProduct = PRODUCT_CATALOG.some(item => item.name === product.name)
+  const handleProductChange = (name: string) => {
+    const catalogProduct = findCatalogProduct(name)
+    onChange({
+      name,
+      shortCode: catalogProduct?.shortCode || '',
+      reamsPerBox: catalogProduct?.reamsPerBox,
+    })
+  }
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-      <div className="sm:col-span-2">
-        <input
-          type="text"
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
+      <div className="lg:col-span-5">
+        <select
           value={product.name}
-          onChange={e => onChange({ name: e.target.value })}
-          placeholder="Product name"
+          onChange={e => handleProductChange(e.target.value)}
           className={cn(
             'w-full px-3 py-2 text-sm rounded-lg border bg-background focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none transition-all',
             error && 'border-red-500'
           )}
-        />
+        >
+          <option value="">Select product</option>
+          {product.name && !hasCatalogProduct && (
+            <option value={product.name}>{product.name}</option>
+          )}
+          {PRODUCT_CATALOG.map(item => (
+            <option key={item.shortCode} value={item.name}>
+              {item.name} - {item.shortCode} - {item.reamsPerBox} ream/box
+            </option>
+          ))}
+        </select>
         {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
       </div>
-      
-      <div>
+
+      <div className="lg:col-span-2">
+        <input
+          type="text"
+          value={product.shortCode || ''}
+          onChange={e => onChange({ shortCode: e.target.value })}
+          className="w-full px-3 py-2 text-sm rounded-lg border bg-muted/50 focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none transition-all"
+          placeholder="Short code"
+        />
+      </div>
+
+      <div className="lg:col-span-2">
         <div className="flex items-center gap-2">
           <input
             type="number"
-            value={product.qty}
-            onChange={e => onChange({ qty: Math.max(1, parseInt(e.target.value) || 1) })}
+            value={product.reamsPerBox || ''}
+            onChange={e => onChange({ reamsPerBox: parseInt(e.target.value) || undefined })}
             min="1"
-            className="w-full px-3 py-2 text-sm rounded-lg border bg-background focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none transition-all"
-            placeholder="Qty"
+            className="w-full px-3 py-2 text-sm rounded-lg border bg-muted/50 focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none transition-all"
+            placeholder="ream/box"
           />
-          <span className="text-xs text-muted-foreground whitespace-nowrap">reams</span>
+          <span className="text-xs text-muted-foreground whitespace-nowrap">/box</span>
         </div>
       </div>
-      
-      <div className="flex items-start gap-2">
+
+      <div className="lg:col-span-1">
+        <input
+          type="number"
+          value={product.qty}
+          onChange={e => onChange({ qty: Math.max(1, parseInt(e.target.value) || 1) })}
+          min="1"
+          className="w-full px-3 py-2 text-sm rounded-lg border bg-background focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none transition-all"
+          placeholder="Qty"
+        />
+      </div>
+
+      <div className="lg:col-span-2 flex items-start gap-2">
         <div className="flex-1 space-y-2">
           <input
             type="number"

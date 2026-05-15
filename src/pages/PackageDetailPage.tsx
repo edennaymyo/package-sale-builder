@@ -15,10 +15,18 @@ import { cn, formatCurrency, formatPercent } from '@/lib/utils'
 import {
   Package,
   ProductLine,
+  ProductOption,
   getPackageById,
   calculatePackageTotals,
   calculateLineTotal,
 } from '@/lib/packages'
+
+function productMeta(product: ProductOption): string {
+  const parts = []
+  if (product.shortCode) parts.push(product.shortCode)
+  if (product.reamsPerBox) parts.push(`${product.reamsPerBox} ream/box`)
+  return parts.join(' | ')
+}
 
 export function PackageDetailPage() {
   const { id } = useParams()
@@ -243,6 +251,11 @@ export function PackageDetailPage() {
                         </span>
                         <div>
                           <p className="font-medium text-sm">{selected.name}</p>
+                          {productMeta(selected) && (
+                            <p className="text-xs text-muted-foreground">
+                              {productMeta(selected)}
+                            </p>
+                          )}
                           <p className="text-xs text-muted-foreground">
                             {selected.qty} ream{selected.qty > 1 ? 's' : ''}
                             {line.type === 'or-group' && (
@@ -327,6 +340,11 @@ function ProductLineCard({ line, index, selectedOptionId, onSelectOption }: Prod
             </span>
             <div>
               <p className="font-medium">{line.fixedProduct.name}</p>
+              {productMeta(line.fixedProduct) && (
+                <p className="text-xs text-muted-foreground">
+                  {productMeta(line.fixedProduct)}
+                </p>
+              )}
               <p className="text-sm text-muted-foreground">
                 {line.fixedProduct.qty} ream{line.fixedProduct.qty > 1 ? 's' : ''}
               </p>
@@ -383,6 +401,11 @@ function ProductLineCard({ line, index, selectedOptionId, onSelectOption }: Prod
                   </div>
                   <div>
                     <p className="font-medium">{option.name}</p>
+                    {productMeta(option) && (
+                      <p className="text-xs text-muted-foreground">
+                        {productMeta(option)}
+                      </p>
+                    )}
                     <p className="text-xs text-muted-foreground">
                       {option.qty} ream{option.qty > 1 ? 's' : ''}
                     </p>
