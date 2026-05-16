@@ -23,6 +23,7 @@ import {
   fetchPackages,
   addPackageRemote,
   updatePackageRemote,
+  deletePackageRemote,
   calculatePackageTotals,
 } from '@/lib/packages'
 
@@ -34,6 +35,7 @@ export function BuilderPage() {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [savedPackages, setSavedPackages] = useState<Package[]>([])
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
 
   useEffect(() => {
     let active = true
@@ -226,6 +228,16 @@ export function BuilderPage() {
     }))
   }
 
+  const handleDeletePackage = async (packageId: string) => {
+    try {
+      const updatedPackages = await deletePackageRemote(packageId)
+      setSavedPackages(updatedPackages)
+      setDeleteConfirmId(null)
+    } catch (error) {
+      setErrors({ save: error instanceof Error ? error.message : 'Failed to delete package' })
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -277,19 +289,55 @@ export function BuilderPage() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {savedPackages.map(savedPackage => (
-              <button
+              <div
                 key={savedPackage.id}
-                onClick={() => navigate(`/builder/${savedPackage.id}`)}
-                className="flex items-center justify-between gap-3 rounded-lg border bg-muted/30 px-4 py-3 text-left hover:border-gold hover:bg-gold/10 transition-colors"
+                className="rounded-lg border bg-muted/30 px-4 py-3"
               >
-                <div className="min-w-0">
-                  <p className="font-medium text-navy truncate">{savedPackage.name || 'Untitled Package'}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {savedPackage.productLines.length} product line(s)
-                  </p>
+                <div className="flex items-center justify-between gap-3">
+                  <button
+                    onClick={() => navigate(`/builder/${savedPackage.id}`)}
+                    className="min-w-0 flex-1 text-left"
+                  >
+                    <p className="font-medium text-navy truncate">{savedPackage.name || 'Untitled Package'}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {savedPackage.productLines.length} product line(s)
+                    </p>
+                  </button>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => navigate(`/builder/${savedPackage.id}`)}
+                      className="p-2 text-gold hover:bg-gold/10 rounded-lg transition-colors"
+                      aria-label="Edit package"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => setDeleteConfirmId(savedPackage.id)}
+                      className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                      aria-label="Delete package"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
-                <Edit className="w-4 h-4 text-gold flex-shrink-0" />
-              </button>
+                {deleteConfirmId === savedPackage.id && (
+                  <div className="mt-3 flex items-center gap-2 rounded-lg bg-red-50 p-3">
+                    <p className="flex-1 text-sm text-red-700">Delete this package?</p>
+                    <button
+                      onClick={() => handleDeletePackage(savedPackage.id)}
+                      className="px-3 py-1.5 rounded-md bg-red-500 text-white text-sm font-medium hover:bg-red-600"
+                    >
+                      Delete
+                    </button>
+                    <button
+                      onClick={() => setDeleteConfirmId(null)}
+                      className="px-3 py-1.5 rounded-md border border-red-200 bg-white text-red-600 text-sm font-medium hover:bg-red-50"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         </div>

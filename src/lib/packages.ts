@@ -289,3 +289,9 @@ export async function updatePackageRemote(pkg: Package): Promise<Package[]> {
 
   return persistPackages(updatedPackages)
 }
+
+export async function deletePackageRemote(id: string): Promise<Package[]> {
+  const packages = await fetchPackages()
+  const updatedPackages = packages.filter(pkg => pkg.id !== id)
+  return persistPackages(updatedPackages)
+}
