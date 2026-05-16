@@ -13,8 +13,8 @@ export function Layout() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <Link to="/explore" className="flex items-center gap-3">
-              <div className="h-11 w-11">
+            <Link to="/explore" className="flex items-center gap-5 sm:gap-6">
+              <div className="h-11 w-11 flex-shrink-0 sm:h-12 sm:w-12">
                 <img
                   src="/brand/modern-science-mark-reverse.png"
                   alt="Modern Science"
@@ -23,11 +23,11 @@ export function Layout() {
               </div>
               <div className="hidden sm:block">
                 <img
-                  src="/brand/modern-science-logo-reverse.png"
+                  src="/brand/modern-science-name-reverse.png"
                   alt="Modern Science Co.,Ltd."
-                  className="h-9 w-auto max-w-[285px] object-contain"
+                  className="h-6 w-auto max-w-[320px] object-contain"
                 />
-                <p className="mt-0.5 text-xs font-medium text-gold">Package Promotion Builder</p>
+                <p className="mt-1 text-sm font-semibold text-gold">Package Promotion Builder</p>
               </div>
             </Link>
 
