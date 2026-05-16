@@ -207,21 +207,19 @@ export function PackageDetailPage() {
             {/* Card Header */}
             <div className="bg-navy p-5 text-white">
               <div className="mb-4 flex items-center gap-3">
-                <div className="h-14 w-14 rounded-lg bg-white p-1.5 shadow-sm">
+                <div className="h-14 w-14 flex-shrink-0">
                   <img
-                    src="/brand/modern-science-mark.png"
+                    src="/brand/modern-science-mark-reverse.png"
                     alt=""
                     className="h-full w-full object-contain"
                   />
                 </div>
                 <div className="min-w-0">
-                  <div className="mb-1 rounded bg-white px-2 py-1">
-                    <img
-                      src="/brand/modern-science-logo.png"
-                      alt="Modern Science Co.,Ltd."
-                      className="h-6 w-auto max-w-[220px] object-contain"
-                    />
-                  </div>
+                  <img
+                    src="/brand/modern-science-logo-reverse.png"
+                    alt="Modern Science Co.,Ltd."
+                    className="mb-1 h-7 w-auto max-w-[240px] object-contain"
+                  />
                   <p className="text-white/80 text-xs">Premium Paper Wholesale</p>
                 </div>
               </div>

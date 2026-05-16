@@ -267,7 +267,7 @@ export function BuilderPage() {
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <div className="hidden h-12 w-12 flex-shrink-0 rounded-lg bg-white p-1.5 shadow-sm ring-1 ring-border sm:block">
+          <div className="hidden h-12 w-12 flex-shrink-0 sm:block">
             <img
               src="/brand/modern-science-mark.png"
               alt=""

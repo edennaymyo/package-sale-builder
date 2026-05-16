@@ -14,21 +14,19 @@ export function Layout() {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link to="/explore" className="flex items-center gap-3">
-              <div className="h-11 w-11 rounded-lg bg-white p-1.5 shadow-sm ring-1 ring-white/20">
+              <div className="h-11 w-11">
                 <img
-                  src="/brand/modern-science-mark.png"
+                  src="/brand/modern-science-mark-reverse.png"
                   alt="Modern Science"
                   className="h-full w-full object-contain"
                 />
               </div>
               <div className="hidden sm:block">
-                <div className="rounded-md bg-white px-2 py-1 shadow-sm">
-                  <img
-                    src="/brand/modern-science-logo.png"
-                    alt="Modern Science Co.,Ltd."
-                    className="h-7 w-auto max-w-[250px] object-contain"
-                  />
-                </div>
+                <img
+                  src="/brand/modern-science-logo-reverse.png"
+                  alt="Modern Science Co.,Ltd."
+                  className="h-9 w-auto max-w-[285px] object-contain"
+                />
                 <p className="mt-0.5 text-xs font-medium text-gold">Package Promotion Builder</p>
               </div>
             </Link>
@@ -62,9 +60,9 @@ export function Layout() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm">
           <div className="mb-3 flex justify-center">
             <img
-              src="/brand/modern-science-mark.png"
+              src="/brand/modern-science-mark-reverse.png"
               alt=""
-              className="h-9 w-9 rounded-md bg-white/95 object-contain p-1"
+              className="h-10 w-10 object-contain"
             />
           </div>
           <p>&copy; {new Date().getFullYear()} Modern Science Co.,Ltd. All rights reserved.</p>

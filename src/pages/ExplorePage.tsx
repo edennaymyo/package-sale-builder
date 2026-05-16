@@ -47,7 +47,7 @@ export function ExplorePage() {
       {/* Header */}
       <div className="rounded-xl border bg-card p-4 shadow-sm">
         <div className="flex items-center gap-4">
-          <div className="h-14 w-14 flex-shrink-0 rounded-lg bg-white p-1.5 shadow-sm ring-1 ring-border">
+          <div className="h-14 w-14 flex-shrink-0">
             <img
               src="/brand/modern-science-mark.png"
               alt=""
@@ -202,7 +202,7 @@ export function ExplorePage() {
         </div>
       ) : (
         <div className="text-center py-16">
-          <div className="w-20 h-20 mx-auto bg-white rounded-xl flex items-center justify-center mb-4 p-2 shadow-sm ring-1 ring-border">
+          <div className="w-20 h-20 mx-auto mb-4">
             <img
               src="/brand/modern-science-mark.png"
               alt=""
