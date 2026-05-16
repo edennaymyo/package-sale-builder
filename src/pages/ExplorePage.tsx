@@ -143,9 +143,13 @@ export function ExplorePage() {
                         </span>
                       ))}
                       {products.length > 4 && (
-                        <span className="px-2 py-0.5 bg-gold/20 text-gold-dark text-xs rounded-full">
+                        <Link
+                          to={`/package/${pkg.id}`}
+                          aria-label={`View all products in ${pkg.name || 'this package'}`}
+                          className="px-2 py-0.5 bg-gold/20 text-gold-dark text-xs rounded-full transition-colors hover:bg-gold/30 focus:outline-none focus:ring-2 focus:ring-gold/50"
+                        >
                           +{products.length - 4} more
-                        </span>
+                        </Link>
                       )}
                       {products.length === 0 && (
                         <span className="text-xs text-muted-foreground">No products</span>
