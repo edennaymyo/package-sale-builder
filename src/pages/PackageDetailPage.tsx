@@ -191,40 +191,11 @@ export function PackageDetailPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Product Selection */}
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-navy">Select Your Products</h2>
-          
-          {pkg.description && (
-            <p className="text-muted-foreground">{pkg.description}</p>
-          )}
-
-          <div className="space-y-4">
-            {pkg.productLines.map((line, idx) => (
-              <ProductLineCard
-                key={line.id}
-                line={line}
-                index={idx}
-                selectedOptionId={selections[line.id]}
-                onSelectOption={optionId => handleSelectOption(line.id, optionId)}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* Shareable Card Preview */}
-        <div className="lg:sticky lg:top-24 space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-navy">Share Card Preview</h2>
-            <span className="text-xs text-muted-foreground">Image will be generated from this</span>
-          </div>
-          
+      <div className="mx-auto max-w-[440px] space-y-4">
           {/* The actual card that will be converted to image */}
           <div
             ref={cardRef}
-            className="bg-white rounded-xl overflow-hidden shadow-lg border"
-            style={{ maxWidth: '400px' }}
+            className="overflow-hidden rounded-xl border bg-white shadow-lg"
           >
             {/* Card Header */}
             <div className="bg-navy p-5 text-white">
@@ -249,36 +220,15 @@ export function PackageDetailPage() {
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                   Package Includes:
                 </p>
-                {pkg.productLines.map((line, idx) => {
-                  const selected = getSelectedProduct(line, selections[line.id])
-                  
-                  if (!selected) return null
-                  
-                  const lineTotal = calculateLineTotal(line, selections[line.id])
-                  
-                  return (
-                    <div key={line.id} className="flex items-center justify-between py-2 border-b last:border-0">
-                      <div className="flex items-center gap-2">
-                        <span className="w-5 h-5 bg-gold/20 text-gold text-xs font-bold rounded-full flex items-center justify-center">
-                          {idx + 1}
-                        </span>
-                        <div>
-                          <p className="font-medium text-sm">{selected.name}</p>
-                          <p className="text-sm font-semibold text-navy">
-                            {boxInfo(selected)} <span className="text-xs font-normal text-muted-foreground">x {reamPriceInfo(selected)}</span>
-                            {line.type === 'or-group' && (
-                              <span className="text-gold ml-1">(or choice)</span>
-                            )}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-xs text-muted-foreground">Amount</p>
-                        <p className="text-lg font-bold text-gold">{formatCurrency(lineTotal.original)}</p>
-                      </div>
-                    </div>
-                  )
-                })}
+                {pkg.productLines.map((line, idx) => (
+                  <ShareCardLine
+                    key={line.id}
+                    line={line}
+                    index={idx}
+                    selectedOptionId={selections[line.id]}
+                    onSelectOption={optionId => handleSelectOption(line.id, optionId)}
+                  />
+                ))}
               </div>
 
               {/* Pricing Summary */}
@@ -310,7 +260,7 @@ export function PackageDetailPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" style={{ maxWidth: '400px' }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <button
               onClick={shareToViber}
               className="flex items-center justify-center gap-2 rounded-lg bg-[#7360f2] px-4 py-3 text-sm font-semibold text-white hover:bg-[#6050d2] transition-colors"
@@ -327,43 +277,40 @@ export function PackageDetailPage() {
               {generating ? 'Saving...' : 'Save order image'}
             </button>
           </div>
-        </div>
       </div>
     </div>
   )
 }
 
-interface ProductLineCardProps {
+interface ShareCardLineProps {
   line: ProductLine
   index: number
   selectedOptionId?: string
   onSelectOption: (optionId: string) => void
 }
 
-function ProductLineCard({ line, index, selectedOptionId, onSelectOption }: ProductLineCardProps) {
+function ShareCardLine({ line, index, selectedOptionId, onSelectOption }: ShareCardLineProps) {
   const lineTotal = calculateLineTotal(line, selectedOptionId)
 
   if (line.type === 'fixed' && line.fixedProduct) {
     return (
-      <div className="bg-card rounded-xl border p-4">
-        <div className="space-y-3">
-          <div className="flex items-start gap-3">
-            <span className="w-8 h-8 bg-navy text-white text-sm font-bold rounded-full flex items-center justify-center">
+      <div className="border-b py-2 last:border-0">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex min-w-0 items-start gap-2">
+            <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-gold/20 text-xs font-bold text-gold">
               {index + 1}
             </span>
-            <div className="min-w-0 flex-1">
-              <p className="truncate whitespace-nowrap text-lg font-semibold text-navy">{line.fixedProduct.name}</p>
-              <div className="mt-2 flex flex-wrap items-center gap-2">
-                <span className="rounded-md bg-navy/5 px-2.5 py-1 text-base font-bold text-navy">
-                  {boxInfo(line.fixedProduct)}
-                </span>
-                <span className="text-sm text-muted-foreground">x {reamPriceInfo(line.fixedProduct)}</span>
-              </div>
+            <div className="min-w-0">
+              <p className="truncate whitespace-nowrap text-sm font-medium text-navy">{line.fixedProduct.name}</p>
+              <p className="text-sm font-semibold text-navy">
+                {boxInfo(line.fixedProduct)}
+                <span className="text-xs font-normal text-muted-foreground"> x {reamPriceInfo(line.fixedProduct)}</span>
+              </p>
             </div>
           </div>
-          <div className="border-t pt-3 text-right">
+          <div className="flex-shrink-0 text-right">
             <p className="text-xs text-muted-foreground">Amount</p>
-            <p className="text-xl font-bold text-gold">{formatCurrency(lineTotal.original)}</p>
+            <p className="text-lg font-bold text-gold">{formatCurrency(lineTotal.original)}</p>
           </div>
         </div>
       </div>
@@ -372,18 +319,17 @@ function ProductLineCard({ line, index, selectedOptionId, onSelectOption }: Prod
 
   if (line.type === 'or-group' && line.orOptions) {
     return (
-      <div className="bg-card rounded-xl border p-5">
-        <div className="mb-4 flex items-center gap-3">
-          <span className="w-9 h-9 bg-gold text-navy text-sm font-bold rounded-full flex items-center justify-center">
+      <div className="animate-choice-shake border-b py-3 last:border-0">
+        <div className="mb-2 flex items-center gap-2">
+          <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-gold text-xs font-bold text-navy">
             {index + 1}
           </span>
-          <div>
-            <p className="font-semibold text-navy">Choose one option</p>
-            <p className="text-sm text-muted-foreground">Select the product you want for this line.</p>
-          </div>
+          <span className="rounded-full bg-gold/15 px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-gold-dark">
+            Choose one option
+          </span>
         </div>
-        
-        <div className="grid grid-cols-1 gap-3">
+
+        <div className="space-y-2">
           {line.orOptions.map(option => {
             const isSelected = selectedOptionId === option.id || (!selectedOptionId && line.orOptions?.[0]?.id === option.id)
             const optTotal = calculateLineTotal({
@@ -397,34 +343,32 @@ function ProductLineCard({ line, index, selectedOptionId, onSelectOption }: Prod
                 key={option.id}
                 onClick={() => onSelectOption(option.id)}
                 className={cn(
-                  'w-full rounded-xl border-2 p-4 text-left transition-all',
+                  'w-full rounded-lg border-2 p-3 text-left transition-all',
                   isSelected
-                    ? 'border-gold bg-gold/10 shadow-sm'
-                    : 'border-border bg-white hover:border-gold/40 hover:bg-gold/5'
+                    ? 'border-gold bg-gold/10 shadow-sm ring-2 ring-gold/20'
+                    : 'border-border bg-white hover:border-gold/50 hover:bg-gold/5'
                 )}
               >
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3">
-                    <div className={cn(
-                      'mt-1 w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0',
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex min-w-0 items-start gap-2">
+                    <span className={cn(
+                      'mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border-2',
                       isSelected ? 'border-gold bg-white' : 'border-muted-foreground/30'
                     )}>
-                      {isSelected && <div className="w-3 h-3 bg-gold rounded-full" />}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate whitespace-nowrap text-lg font-semibold text-navy">{option.name}</p>
-                      <div className="mt-2 flex flex-wrap items-center gap-2">
-                        <span className="rounded-md bg-navy/5 px-2.5 py-1 text-base font-bold text-navy">
-                          {boxInfo(option)}
-                        </span>
-                        <span className="text-sm text-muted-foreground">x {reamPriceInfo(option)}</span>
-                      </div>
+                      {isSelected && <span className="h-2.5 w-2.5 rounded-full bg-gold" />}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="truncate whitespace-nowrap text-sm font-semibold text-navy">{option.name}</p>
+                      <p className="text-sm font-semibold text-navy">
+                        {boxInfo(option)}
+                        <span className="text-xs font-normal text-muted-foreground"> x {reamPriceInfo(option)}</span>
+                      </p>
                     </div>
                   </div>
-                  <div className="border-t pt-3 text-right">
+                  <div className="flex-shrink-0 text-right">
                     <p className="text-xs text-muted-foreground">Amount</p>
                     <p className={cn(
-                      'text-xl font-bold',
+                      'text-base font-bold',
                       isSelected ? 'text-gold' : 'text-muted-foreground'
                     )}>
                       {formatCurrency(optTotal)}
