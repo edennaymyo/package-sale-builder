@@ -21,6 +21,7 @@ import {
 } from '@/lib/packages'
 
 const VIBER_NUMBER = '09965162112'
+const VIBER_CHAT_URL = 'viber://chat?number=%2B959965162112'
 
 function boxInfo(product: ProductOption): string {
   const boxLabel = product.qty === 1 ? 'box' : 'boxes'
@@ -325,9 +326,12 @@ export function PackageDetailPage() {
               </div>
 
               {/* CTA */}
-              <div className="bg-gold text-navy text-center py-3 rounded-lg font-semibold">
+              <a
+                href={VIBER_CHAT_URL}
+                className="block bg-gold text-navy text-center py-3 rounded-lg font-semibold hover:bg-gold-dark transition-colors"
+              >
                 Contact us on Viber: {VIBER_NUMBER}
-              </div>
+              </a>
             </div>
           </div>
         </div>
