@@ -24,6 +24,7 @@ export interface Package {
   description: string
   validFrom: string
   validTo: string
+  totalDiscount?: number
   productLines: ProductLine[]
   createdAt: string
   updatedAt: string
@@ -54,6 +55,7 @@ export function createEmptyPackage(): Package {
     description: '',
     validFrom: new Date().toISOString().split('T')[0],
     validTo: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    totalDiscount: 0,
     productLines: [createEmptyProductLine()],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -71,9 +73,12 @@ function parseAmount(value: number | string): number {
 
 export function calculateLineTotal(line: ProductLine, selectedOptionId?: string): { original: number; promo: number } {
   if (line.type === 'fixed' && line.fixedProduct) {
+    const boxes = parseAmount(line.fixedProduct.qty)
+    const reamsPerBox = parseAmount(line.fixedProduct.reamsPerBox || 1)
+    const reamPrice = parseAmount(line.fixedProduct.originalPrice)
     return {
-      original: parseAmount(line.fixedProduct.qty) * parseAmount(line.fixedProduct.originalPrice),
-      promo: parseAmount(line.fixedProduct.qty) * parseAmount(line.fixedProduct.promoPrice),
+      original: boxes * reamsPerBox * reamPrice,
+      promo: boxes * reamsPerBox * reamPrice,
     }
   }
   
@@ -83,9 +88,12 @@ export function calculateLineTotal(line: ProductLine, selectedOptionId?: string)
       : line.orOptions[0]
     
     if (selected) {
+      const boxes = parseAmount(selected.qty)
+      const reamsPerBox = parseAmount(selected.reamsPerBox || 1)
+      const reamPrice = parseAmount(selected.originalPrice)
       return {
-        original: parseAmount(selected.qty) * parseAmount(selected.originalPrice),
-        promo: parseAmount(selected.qty) * parseAmount(selected.promoPrice),
+        original: boxes * reamsPerBox * reamPrice,
+        promo: boxes * reamsPerBox * reamPrice,
       }
     }
   }
@@ -109,16 +117,16 @@ export function calculatePackageTotals(pkg: Package | null, selections?: Record<
   }
   
   let originalTotal = 0
-  let promoTotal = 0
   
   pkg.productLines.forEach(line => {
     const selectedId = selections?.[line.id]
     const totals = calculateLineTotal(line, selectedId)
     originalTotal += totals.original
-    promoTotal += totals.promo
   })
   
-  const discountAmount = originalTotal - promoTotal
+  const requestedDiscount = parseAmount(pkg.totalDiscount || 0)
+  const discountAmount = Math.min(Math.max(requestedDiscount, 0), originalTotal)
+  const promoTotal = originalTotal - discountAmount
   const discountPercent = originalTotal > 0 ? (discountAmount / originalTotal) * 100 : 0
   
   return {

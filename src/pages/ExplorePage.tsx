@@ -7,7 +7,7 @@ import {
   Percent,
   Eye,
 } from 'lucide-react'
-import { cn, formatCurrency, formatPercent } from '@/lib/utils'
+import { cn, formatCurrency } from '@/lib/utils'
 import {
   Package,
   fetchPackages,
@@ -140,13 +140,13 @@ export function ExplorePage() {
                   {/* Pricing */}
                   <div className="flex items-center justify-between pb-3 border-b">
                     <div>
-                      <p className="text-xs text-muted-foreground">Original</p>
-                      <p className="font-medium line-through text-muted-foreground">
+                      <p className="text-xs text-muted-foreground">Total Amount</p>
+                      <p className="font-medium text-muted-foreground">
                         {formatCurrency(totals.originalTotal)}
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs text-muted-foreground">Promo Price</p>
+                      <p className="text-xs text-muted-foreground">Package Price</p>
                       <p className="font-bold text-lg text-gold">
                         {formatCurrency(totals.promoTotal)}
                       </p>
@@ -158,7 +158,7 @@ export function ExplorePage() {
                     <div className="flex items-center gap-1.5 text-green-600">
                       <Percent className="w-4 h-4" />
                       <span className="font-medium">
-                        Save {formatPercent(totals.discountPercent)}
+                        Discount {formatCurrency(totals.discountAmount)}
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5 text-muted-foreground">

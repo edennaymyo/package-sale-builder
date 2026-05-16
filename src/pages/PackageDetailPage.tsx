@@ -5,7 +5,6 @@ import {
   ArrowLeft,
   Package as PackageIcon,
   Calendar,
-  Percent,
   Download,
   MessageCircle,
   Check,
@@ -22,10 +21,12 @@ import {
 } from '@/lib/packages'
 
 function productMeta(product: ProductOption): string {
-  const parts = []
-  if (product.shortCode) parts.push(product.shortCode)
-  if (product.reamsPerBox) parts.push(`${product.reamsPerBox} ream/box`)
-  return parts.join(' | ')
+  return product.shortCode || ''
+}
+
+function boxInfo(product: ProductOption): string {
+  const boxLabel = product.qty === 1 ? 'box' : 'boxes'
+  return `${product.qty} ${boxLabel}`
 }
 
 export function PackageDetailPage() {
@@ -93,10 +94,10 @@ export function PackageDetailPage() {
   const shareToViber = useCallback(() => {
     if (!pkg) return
     const pkgTotals = calculatePackageTotals(pkg, selections)
-    const text = `🎁 ${pkg.name}\n\n` +
-      `💰 Special Price: ${formatCurrency(pkgTotals.promoTotal)}\n` +
-      `📦 Save ${formatPercent(pkgTotals.discountPercent)}!\n\n` +
-      `📅 Valid: ${pkg.validFrom} to ${pkg.validTo}\n\n` +
+    const text = `${pkg.name}\n\n` +
+      `Package Price: ${formatCurrency(pkgTotals.promoTotal)}\n` +
+      `Total Discount: ${formatCurrency(pkgTotals.discountAmount)} (${formatPercent(pkgTotals.discountPercent)})\n\n` +
+      `Valid: ${pkg.validFrom} to ${pkg.validTo}\n\n` +
       `Contact Modern Science Co.,Ltd. for inquiry!`
     
     // Viber share URL
@@ -264,7 +265,7 @@ export function PackageDetailPage() {
                             </p>
                           )}
                           <p className="text-xs text-muted-foreground">
-                            {selected.qty} ream{selected.qty > 1 ? 's' : ''}
+                            {boxInfo(selected)}
                             {line.type === 'or-group' && (
                               <span className="text-gold ml-1">(or choice)</span>
                             )}
@@ -272,12 +273,8 @@ export function PackageDetailPage() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-xs text-muted-foreground line-through">
-                          {formatCurrency(lineTotal.original)}
-                        </p>
-                        <p className="font-semibold text-gold">
-                          {formatCurrency(lineTotal.promo)}
-                        </p>
+                        <p className="text-xs text-muted-foreground">Amount</p>
+                        <p className="font-semibold text-gold">{formatCurrency(lineTotal.original)}</p>
                       </div>
                     </div>
                   )
@@ -287,24 +284,19 @@ export function PackageDetailPage() {
               {/* Pricing Summary */}
               <div className="bg-navy/5 rounded-lg p-4">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm text-muted-foreground">Original Price:</span>
-                  <span className="line-through text-muted-foreground">
+                  <span className="text-sm text-muted-foreground">Total Amount:</span>
+                  <span className="font-medium">
                     {formatCurrency(totals.originalTotal)}
                   </span>
                 </div>
                 <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm text-green-600 font-medium">Total Discount:</span>
+                  <span className="text-green-600 font-bold">{formatCurrency(totals.discountAmount)}</span>
+                </div>
+                <div className="flex justify-between items-center pt-2 border-t border-navy/10">
                   <span className="text-sm font-medium">Package Price:</span>
                   <span className="text-2xl font-bold text-gold">
                     {formatCurrency(totals.promoTotal)}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center pt-2 border-t border-navy/10">
-                  <span className="text-sm text-green-600 font-medium flex items-center gap-1">
-                    <Percent className="w-4 h-4" />
-                    You Save:
-                  </span>
-                  <span className="text-green-600 font-bold">
-                    {formatCurrency(totals.discountAmount)} ({formatPercent(totals.discountPercent)})
                   </span>
                 </div>
               </div>
@@ -353,17 +345,13 @@ function ProductLineCard({ line, index, selectedOptionId, onSelectOption }: Prod
                 </p>
               )}
               <p className="text-sm text-muted-foreground">
-                {line.fixedProduct.qty} ream{line.fixedProduct.qty > 1 ? 's' : ''}
+                {boxInfo(line.fixedProduct)}
               </p>
             </div>
           </div>
           <div className="text-right">
-            <p className="text-sm text-muted-foreground line-through">
-              {formatCurrency(lineTotal.original)}
-            </p>
-            <p className="font-bold text-gold">
-              {formatCurrency(lineTotal.promo)}
-            </p>
+            <p className="text-xs text-muted-foreground">Amount</p>
+            <p className="font-bold text-gold">{formatCurrency(lineTotal.original)}</p>
           </div>
         </div>
       </div>
@@ -385,8 +373,11 @@ function ProductLineCard({ line, index, selectedOptionId, onSelectOption }: Prod
         <div className="space-y-2 ml-11">
           {line.orOptions.map(option => {
             const isSelected = selectedOptionId === option.id || (!selectedOptionId && line.orOptions?.[0]?.id === option.id)
-            const optTotal = option.qty * option.promoPrice
-            const optOriginal = option.qty * option.originalPrice
+            const optTotal = calculateLineTotal({
+              id: line.id,
+              type: 'or-group',
+              orOptions: [option],
+            }, option.id).original
             
             return (
               <button
@@ -414,14 +405,12 @@ function ProductLineCard({ line, index, selectedOptionId, onSelectOption }: Prod
                       </p>
                     )}
                     <p className="text-xs text-muted-foreground">
-                      {option.qty} ream{option.qty > 1 ? 's' : ''}
+                      {boxInfo(option)}
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs text-muted-foreground line-through">
-                    {formatCurrency(optOriginal)}
-                  </p>
+                  <p className="text-xs text-muted-foreground">Amount</p>
                   <p className={cn(
                     'font-bold',
                     isSelected ? 'text-gold' : 'text-muted-foreground'

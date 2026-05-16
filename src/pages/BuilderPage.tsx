@@ -446,26 +446,28 @@ export function BuilderPage() {
             
             <div className="space-y-4">
               <div className="pb-4 border-b border-white/20">
-                <p className="text-white/60 text-sm mb-1">Original Total</p>
+                <p className="text-white/60 text-sm mb-1">Total Amount</p>
                 <p className="text-2xl font-bold">
                   {formatCurrency(totals.originalTotal)}
                 </p>
               </div>
               
               <div className="pb-4 border-b border-white/20">
-                <p className="text-white/60 text-sm mb-1">Promotional Price</p>
-                <p className="text-2xl font-bold text-gold">
-                  {formatCurrency(totals.promoTotal)}
-                </p>
+                <label className="block text-white/60 text-sm mb-1">Total Discount</label>
+                <input
+                  type="number"
+                  value={pkg.totalDiscount || ''}
+                  onChange={e => setPkg(prev => ({ ...prev, totalDiscount: parseCurrencyAmount(e.target.value) }))}
+                  className="w-full px-3 py-2 rounded-lg border border-white/20 bg-white/10 text-2xl font-bold text-gold outline-none focus:ring-2 focus:ring-gold/50"
+                  placeholder="0"
+                />
               </div>
               
               <div className="bg-gold/20 rounded-lg p-4">
-                <p className="text-white/80 text-sm mb-1">You Save</p>
-                <p className="text-xl font-bold text-gold">
-                  {formatCurrency(totals.discountAmount)}
-                </p>
+                <p className="text-white/80 text-sm mb-1">Package Price</p>
+                <p className="text-xl font-bold text-gold">{formatCurrency(totals.promoTotal)}</p>
                 <p className="text-sm text-gold/80">
-                  ({formatPercent(totals.discountPercent)} off)
+                  {formatCurrency(totals.discountAmount)} discount ({formatPercent(totals.discountPercent)} off)
                 </p>
               </div>
               
@@ -551,7 +553,7 @@ function ProductInput({ product, onChange, error, onRemove }: ProductInputProps)
               >
                 <span className="block font-medium text-navy">{item.name}</span>
                 <span className="block text-xs text-muted-foreground">
-                  {item.shortCode} | {item.reamsPerBox} ream/box
+                  {item.shortCode} | {item.reamsPerBox} reams per box
                 </span>
               </button>
             ))}
@@ -575,45 +577,27 @@ function ProductInput({ product, onChange, error, onRemove }: ProductInputProps)
       </div>
 
       <div className="lg:col-span-2">
-        <div className="flex items-center gap-2">
-          <input
-            type="number"
-            value={product.reamsPerBox || ''}
-            onChange={e => onChange({ reamsPerBox: parseInt(e.target.value) || undefined })}
-            min="1"
-            className="w-full px-3 py-2 text-sm rounded-lg border bg-muted/50 focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none transition-all"
-            placeholder="ream/box"
-          />
-          <span className="text-xs text-muted-foreground whitespace-nowrap">/box</span>
-        </div>
-      </div>
-
-      <div className="lg:col-span-1">
         <input
           type="number"
           value={product.qty}
           onChange={e => onChange({ qty: Math.max(1, parseInt(e.target.value) || 1) })}
           min="1"
           className="w-full px-3 py-2 text-sm rounded-lg border bg-background focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none transition-all"
-          placeholder="Qty"
+          placeholder="Box qty"
         />
       </div>
 
-      <div className="lg:col-span-3 flex items-start gap-2">
-        <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
+      <div className="lg:col-span-4 flex items-start gap-2">
+        <div className="flex-1">
           <input
             type="number"
             value={product.originalPrice || ''}
-            onChange={e => onChange({ originalPrice: parseCurrencyAmount(e.target.value) })}
-            placeholder="Original"
+            onChange={e => {
+              const value = parseCurrencyAmount(e.target.value)
+              onChange({ originalPrice: value, promoPrice: value })
+            }}
+            placeholder="Ream price"
             className="w-full px-3 py-2 text-sm rounded-lg border bg-background focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none transition-all"
-          />
-          <input
-            type="number"
-            value={product.promoPrice || ''}
-            onChange={e => onChange({ promoPrice: parseCurrencyAmount(e.target.value) })}
-            placeholder="Promo"
-            className="w-full px-3 py-2 text-sm rounded-lg border bg-gold/10 focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none transition-all"
           />
         </div>
         
