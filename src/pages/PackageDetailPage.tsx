@@ -326,22 +326,22 @@ function ProductLineCard({ line, index, selectedOptionId, onSelectOption }: Prod
   if (line.type === 'fixed' && line.fixedProduct) {
     return (
       <div className="bg-card rounded-xl border p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="space-y-3">
+          <div className="flex items-start gap-3">
             <span className="w-8 h-8 bg-navy text-white text-sm font-bold rounded-full flex items-center justify-center">
               {index + 1}
             </span>
-            <div>
-              <p className="font-medium">{line.fixedProduct.name}</p>
-              <p className="text-base font-semibold text-navy">
-                {boxInfo(line.fixedProduct)}
-                <span className="ml-2 text-sm font-normal text-muted-foreground">
-                  x {reamPriceInfo(line.fixedProduct)}
+            <div className="min-w-0 flex-1">
+              <p className="truncate whitespace-nowrap text-lg font-semibold text-navy">{line.fixedProduct.name}</p>
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <span className="rounded-md bg-navy/5 px-2.5 py-1 text-base font-bold text-navy">
+                  {boxInfo(line.fixedProduct)}
                 </span>
-              </p>
+                <span className="text-sm text-muted-foreground">x {reamPriceInfo(line.fixedProduct)}</span>
+              </div>
             </div>
           </div>
-          <div className="text-right">
+          <div className="border-t pt-3 text-right">
             <p className="text-xs text-muted-foreground">Amount</p>
             <p className="text-xl font-bold text-gold">{formatCurrency(lineTotal.original)}</p>
           </div>
@@ -383,23 +383,25 @@ function ProductLineCard({ line, index, selectedOptionId, onSelectOption }: Prod
                     : 'border-border bg-white hover:border-gold/40 hover:bg-gold/5'
                 )}
               >
-                <div className="flex items-start gap-4">
-                  <div className={cn(
-                    'mt-1 w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0',
-                    isSelected ? 'border-gold bg-white' : 'border-muted-foreground/30'
-                  )}>
-                    {isSelected && <div className="w-3 h-3 bg-gold rounded-full" />}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-lg font-semibold text-navy">{option.name}</p>
-                    <div className="mt-2 flex flex-wrap items-center gap-2">
-                      <span className="rounded-md bg-navy/5 px-2.5 py-1 text-base font-bold text-navy">
-                        {boxInfo(option)}
-                      </span>
-                      <span className="text-sm text-muted-foreground">x {reamPriceInfo(option)}</span>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className={cn(
+                      'mt-1 w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0',
+                      isSelected ? 'border-gold bg-white' : 'border-muted-foreground/30'
+                    )}>
+                      {isSelected && <div className="w-3 h-3 bg-gold rounded-full" />}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate whitespace-nowrap text-lg font-semibold text-navy">{option.name}</p>
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                        <span className="rounded-md bg-navy/5 px-2.5 py-1 text-base font-bold text-navy">
+                          {boxInfo(option)}
+                        </span>
+                        <span className="text-sm text-muted-foreground">x {reamPriceInfo(option)}</span>
+                      </div>
                     </div>
                   </div>
-                  <div className="text-right flex-shrink-0">
+                  <div className="border-t pt-3 text-right">
                     <p className="text-xs text-muted-foreground">Amount</p>
                     <p className={cn(
                       'text-xl font-bold',
