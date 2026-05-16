@@ -19,7 +19,6 @@ import {
 } from '@/lib/packages'
 
 const VIBER_NUMBER = '09965162112'
-const VIBER_CHAT_URL = 'viber://chat?number=%2B959965162112'
 
 function boxInfo(product: ProductOption): string {
   const boxLabel = product.qty === 1 ? 'box' : 'boxes'
@@ -288,13 +287,6 @@ export function PackageDetailPage() {
                 <span>Valid: {pkg.validFrom} to {pkg.validTo}</span>
               </div>
 
-              {/* CTA */}
-              <a
-                href={VIBER_CHAT_URL}
-                className="block bg-gold text-navy text-center py-3 rounded-lg font-semibold hover:bg-gold-dark transition-colors"
-              >
-                Contact us on Viber: {VIBER_NUMBER}
-              </a>
             </div>
           </div>
 
@@ -360,17 +352,18 @@ function ProductLineCard({ line, index, selectedOptionId, onSelectOption }: Prod
 
   if (line.type === 'or-group' && line.orOptions) {
     return (
-      <div className="bg-card rounded-xl border p-4">
-        <div className="flex items-center gap-3 mb-3">
-          <span className="w-8 h-8 bg-gold text-navy text-sm font-bold rounded-full flex items-center justify-center">
+      <div className="bg-card rounded-xl border p-5">
+        <div className="mb-4 flex items-center gap-3">
+          <span className="w-9 h-9 bg-gold text-navy text-sm font-bold rounded-full flex items-center justify-center">
             {index + 1}
           </span>
           <div>
-            <p className="font-medium text-sm text-muted-foreground">Choose one option:</p>
+            <p className="font-semibold text-navy">Choose one option</p>
+            <p className="text-sm text-muted-foreground">Select the product you want for this line.</p>
           </div>
         </div>
         
-        <div className="space-y-2 ml-11">
+        <div className="grid grid-cols-1 gap-3">
           {line.orOptions.map(option => {
             const isSelected = selectedOptionId === option.id || (!selectedOptionId && line.orOptions?.[0]?.id === option.id)
             const optTotal = calculateLineTotal({
@@ -384,37 +377,37 @@ function ProductLineCard({ line, index, selectedOptionId, onSelectOption }: Prod
                 key={option.id}
                 onClick={() => onSelectOption(option.id)}
                 className={cn(
-                  'w-full flex items-center justify-between p-3 rounded-lg border-2 transition-all text-left',
+                  'w-full rounded-xl border-2 p-4 text-left transition-all',
                   isSelected
-                    ? 'border-gold bg-gold/5'
-                    : 'border-transparent bg-muted/50 hover:bg-muted'
+                    ? 'border-gold bg-gold/10 shadow-sm'
+                    : 'border-border bg-white hover:border-gold/40 hover:bg-gold/5'
                 )}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-start gap-4">
                   <div className={cn(
-                    'w-5 h-5 rounded-full border-2 flex items-center justify-center',
-                    isSelected ? 'border-gold' : 'border-muted-foreground/30'
+                    'mt-1 w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0',
+                    isSelected ? 'border-gold bg-white' : 'border-muted-foreground/30'
                   )}>
-                    {isSelected && <div className="w-2.5 h-2.5 bg-gold rounded-full" />}
+                    {isSelected && <div className="w-3 h-3 bg-gold rounded-full" />}
                   </div>
-                  <div>
-                    <p className="font-medium">{option.name}</p>
-                    <p className="text-base font-semibold text-navy">
-                      {boxInfo(option)}
-                      <span className="ml-2 text-sm font-normal text-muted-foreground">
-                        x {reamPriceInfo(option)}
+                  <div className="min-w-0 flex-1">
+                    <p className="text-lg font-semibold text-navy">{option.name}</p>
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      <span className="rounded-md bg-navy/5 px-2.5 py-1 text-base font-bold text-navy">
+                        {boxInfo(option)}
                       </span>
+                      <span className="text-sm text-muted-foreground">x {reamPriceInfo(option)}</span>
+                    </div>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <p className="text-xs text-muted-foreground">Amount</p>
+                    <p className={cn(
+                      'text-xl font-bold',
+                      isSelected ? 'text-gold' : 'text-muted-foreground'
+                    )}>
+                      {formatCurrency(optTotal)}
                     </p>
                   </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-xs text-muted-foreground">Amount</p>
-                  <p className={cn(
-                    'text-xl font-bold',
-                    isSelected ? 'text-gold' : 'text-muted-foreground'
-                  )}>
-                    {formatCurrency(optTotal)}
-                  </p>
                 </div>
               </button>
             )

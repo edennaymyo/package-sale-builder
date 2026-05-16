@@ -8,7 +8,9 @@ import {
   Package as PackageIcon,
   GripVertical,
   AlertCircle,
-  Edit
+  Edit,
+  ChevronUp,
+  ChevronDown
 } from 'lucide-react'
 import { cn, formatCurrency, formatPercent, parseCurrencyAmount } from '@/lib/utils'
 import { PRODUCT_CATALOG, findCatalogProduct } from '@/lib/productCatalog'
@@ -175,6 +177,22 @@ export function BuilderPage() {
       ...prev,
       productLines: prev.productLines.filter(line => line.id !== lineId)
     }))
+  }
+
+  const moveProductLine = (lineId: string, direction: -1 | 1) => {
+    setPkg(prev => {
+      const currentIndex = prev.productLines.findIndex(line => line.id === lineId)
+      const nextIndex = currentIndex + direction
+      if (currentIndex === -1 || nextIndex < 0 || nextIndex >= prev.productLines.length) {
+        return prev
+      }
+
+      const productLines = [...prev.productLines]
+      const [line] = productLines.splice(currentIndex, 1)
+      productLines.splice(nextIndex, 0, line)
+
+      return { ...prev, productLines }
+    })
   }
 
   const toggleLineType = (lineId: string) => {
@@ -432,8 +450,24 @@ export function BuilderPage() {
                   className="border rounded-lg p-4 bg-muted/30"
                 >
                   <div className="flex items-start gap-3">
-                    <div className="mt-2 text-muted-foreground cursor-grab">
+                    <div className="mt-1 flex flex-col items-center gap-1 text-muted-foreground">
+                      <button
+                        onClick={() => moveProductLine(line.id, -1)}
+                        disabled={lineIdx === 0}
+                        className="p-1 rounded-md hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed"
+                        aria-label="Move line up"
+                      >
+                        <ChevronUp className="w-4 h-4" />
+                      </button>
                       <GripVertical className="w-5 h-5" />
+                      <button
+                        onClick={() => moveProductLine(line.id, 1)}
+                        disabled={lineIdx === pkg.productLines.length - 1}
+                        className="p-1 rounded-md hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed"
+                        aria-label="Move line down"
+                      >
+                        <ChevronDown className="w-4 h-4" />
+                      </button>
                     </div>
                     
                     <div className="flex-1 space-y-3">
