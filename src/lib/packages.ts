@@ -156,6 +156,10 @@ export function getPackageProducts(pkg: Package): string[] {
 const STORAGE_KEY = 'modern-science-packages'
 const API_ENDPOINT = '/api/packages'
 
+function isLocalDevHost(): boolean {
+  return ['localhost', '127.0.0.1', '0.0.0.0'].includes(window.location.hostname)
+}
+
 function normalizeProduct(product: ProductOption): ProductOption {
   const catalogProduct = findCatalogProductByShortCode(product.shortCode)
   return catalogProduct ? {
@@ -237,22 +241,36 @@ async function requestPackages(): Promise<Package[]> {
 }
 
 async function persistPackages(packages: Package[]): Promise<Package[]> {
-  const response = await fetch(API_ENDPOINT, {
-    method: 'PUT',
-    headers: {
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify(packages),
-    credentials: 'same-origin',
-  })
+  try {
+    const response = await fetch(API_ENDPOINT, {
+      method: 'PUT',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify(packages),
+      credentials: 'same-origin',
+    })
 
-  if (!response.ok) {
-    const data = await response.json().catch(() => null)
-    throw new Error(data?.error || 'Failed to save packages')
+    if (!response.ok) {
+      if (isLocalDevHost()) {
+        savePackages(packages)
+        return packages
+      }
+
+      const data = await response.json().catch(() => null)
+      throw new Error(data?.error || 'Failed to save packages')
+    }
+
+    savePackages(packages)
+    return response.json()
+  } catch (error) {
+    if (isLocalDevHost()) {
+      savePackages(packages)
+      return packages
+    }
+
+    throw error
   }
-
-  savePackages(packages)
-  return response.json()
 }
 
 export async function fetchPackages(): Promise<Package[]> {

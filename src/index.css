@@ -99,8 +99,81 @@
   animation: choice-shake 0.45s ease-in-out 0.35s 2;
 }
 
+.discount-badge {
+  position: relative;
+  transform-origin: center;
+  animation: discount-pop 4s ease-in-out infinite;
+}
+
+.discount-badge--shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transform: translateX(-130%);
+  background: linear-gradient(
+    105deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.72) 48%,
+    transparent 76%
+  );
+  animation: discount-shine 4s ease-in-out infinite;
+}
+
+.discount-badge--wiggle .discount-badge__icon {
+  display: inline-block;
+  transform-origin: 50% 70%;
+  animation: money-wiggle 4s ease-in-out infinite;
+}
+
+@keyframes discount-pop {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  5% {
+    opacity: 0.78;
+    transform: scale(0.96);
+  }
+  13% {
+    opacity: 1;
+    transform: scale(1.045);
+  }
+  20%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes discount-shine {
+  0% {
+    transform: translateX(-130%);
+  }
+  22% {
+    transform: translateX(130%);
+  }
+  23%, 100% {
+    transform: translateX(130%);
+  }
+}
+
+@keyframes money-wiggle {
+  0%, 4%, 20%, 100% {
+    transform: rotate(0deg) scale(1);
+  }
+  9% {
+    transform: rotate(-10deg) scale(1.16);
+  }
+  15% {
+    transform: rotate(8deg) scale(1.06);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .animate-choice-shake {
+  .animate-choice-shake,
+  .discount-badge,
+  .discount-badge--shine::after,
+  .discount-badge--wiggle .discount-badge__icon {
     animation: none;
   }
 }

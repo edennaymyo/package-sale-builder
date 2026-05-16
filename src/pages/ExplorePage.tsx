@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom'
 import { 
   Search, 
   Calendar, 
-  Percent,
   Eye,
 } from 'lucide-react'
 import { cn, formatCurrency } from '@/lib/utils'
+import { DiscountBadge } from '@/components/DiscountBadge'
 import {
   Package,
   fetchPackages,
@@ -170,13 +170,14 @@ export function ExplorePage() {
                   </div>
 
                   {/* Discount & Validity */}
-                  <div className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-1.5 text-green-600">
-                      <Percent className="w-4 h-4" />
-                      <span className="font-medium">
-                        Discount {formatCurrency(totals.discountAmount)}
-                      </span>
-                    </div>
+                  <div className="flex items-center justify-between gap-3 text-sm">
+                    <DiscountBadge
+                      amount={totals.discountAmount}
+                      percent={totals.discountPercent}
+                      motion="both"
+                      compact
+                      className="min-w-0"
+                    />
                     <div className="flex items-center gap-1.5 text-muted-foreground">
                       <Calendar className="w-4 h-4" />
                       <span className="text-xs">
