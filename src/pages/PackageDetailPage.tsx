@@ -41,14 +41,16 @@ function buildOrderText(pkg: Package, selections: Record<string, string>): strin
       const selected = getSelectedProduct(line, selections[line.id])
       if (!selected) return null
       const amount = calculateLineTotal(line, selections[line.id]).original
-      return `${index + 1}. ${selected.name}\n   ${boxInfo(selected)} x ${reamPriceInfo(selected)} = ${formatCurrency(amount)}`
+      return `${index + 1}. ${selected.name} - ${boxInfo(selected)} x ${reamPriceInfo(selected)} = ${formatCurrency(amount)}`
     })
     .filter(Boolean)
     .join('\n')
 
-  return `${pkg.name}\n\nOrder Detail:\n${lines}\n\n` +
-    `Total Amount: ${formatCurrency(totals.originalTotal)}\n` +
-    `Total Discount: ${formatCurrency(totals.discountAmount)} (${formatPercent(totals.discountPercent)})\n` +
+  return `${pkg.name}\n` +
+    `Order Detail (${pkg.productLines.length} items)\n` +
+    `${lines}\n` +
+    `Total: ${formatCurrency(totals.originalTotal)}\n` +
+    `Discount: ${formatCurrency(totals.discountAmount)} (${formatPercent(totals.discountPercent)})\n` +
     `Package Price: ${formatCurrency(totals.promoTotal)}\n` +
     `Valid: ${pkg.validFrom} to ${pkg.validTo}\n\n` +
     `Viber: ${VIBER_NUMBER}`
@@ -118,6 +120,7 @@ export function PackageDetailPage() {
   const shareToViber = useCallback(() => {
     if (!pkg) return
     const text = buildOrderText(pkg, selections)
+    navigator.clipboard?.writeText(text).catch(() => undefined)
     
     // Viber share URL
     const viberUrl = `viber://forward?text=${encodeURIComponent(text)}`
