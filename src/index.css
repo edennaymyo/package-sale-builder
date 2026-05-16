@@ -4,33 +4,33 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #f8f9fa;
-  --foreground: #0a1f33;
+  --background: #f7f9f8;
+  --foreground: #083744;
   --card: #ffffff;
   --card-foreground: #0a1f33;
   --popover: #ffffff;
   --popover-foreground: #0a1f33;
-  --primary: #0a1f33;
+  --primary: #083744;
   --primary-foreground: #ffffff;
   --secondary: #e8e0d5;
   --secondary-foreground: #0a1f33;
   --muted: #f1f5f9;
   --muted-foreground: #64748b;
-  --accent: #c2973f;
+  --accent: #b08a34;
   --accent-foreground: #ffffff;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
   --border: #e2e8f0;
   --input: #e2e8f0;
-  --ring: #c2973f;
+  --ring: #b08a34;
   --radius: 0.5rem;
   
-  --navy: #0a1f33;
-  --navy-light: #132d47;
-  --navy-dark: #061424;
-  --gold: #c2973f;
-  --gold-light: #d4ad5a;
-  --gold-dark: #a67f2e;
+  --navy: #083744;
+  --navy-light: #0d4a5a;
+  --navy-dark: #052733;
+  --gold: #b08a34;
+  --gold-light: #caa34a;
+  --gold-dark: #927025;
 }
 
 @theme inline {

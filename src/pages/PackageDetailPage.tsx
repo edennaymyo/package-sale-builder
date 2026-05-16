@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { toPng } from 'html-to-image'
 import {
   ArrowLeft,
-  Package as PackageIcon,
   Calendar,
   Download,
   MessageCircle,
@@ -207,12 +206,22 @@ export function PackageDetailPage() {
           >
             {/* Card Header */}
             <div className="bg-navy p-5 text-white">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 bg-gold rounded-lg flex items-center justify-center">
-                  <PackageIcon className="w-7 h-7 text-navy" />
+              <div className="mb-4 flex items-center gap-3">
+                <div className="h-14 w-14 rounded-lg bg-white p-1.5 shadow-sm">
+                  <img
+                    src="/brand/modern-science-mark.png"
+                    alt=""
+                    className="h-full w-full object-contain"
+                  />
                 </div>
-                <div>
-                  <p className="text-gold text-xs font-medium">Modern Science Co.,Ltd.</p>
+                <div className="min-w-0">
+                  <div className="mb-1 rounded bg-white px-2 py-1">
+                    <img
+                      src="/brand/modern-science-logo.png"
+                      alt="Modern Science Co.,Ltd."
+                      className="h-6 w-auto max-w-[220px] object-contain"
+                    />
+                  </div>
                   <p className="text-white/80 text-xs">Premium Paper Wholesale</p>
                 </div>
               </div>

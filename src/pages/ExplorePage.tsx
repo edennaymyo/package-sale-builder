@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { 
   Search, 
-  Package as PackageIcon, 
   Calendar, 
   Percent,
   Eye,
@@ -46,14 +45,23 @@ export function ExplorePage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-navy">Explore Packages</h1>
-          <p className="text-muted-foreground text-sm">
-            Browse promotional packages ({packages.length}/20 available)
-          </p>
+      <div className="rounded-xl border bg-card p-4 shadow-sm">
+        <div className="flex items-center gap-4">
+          <div className="h-14 w-14 flex-shrink-0 rounded-lg bg-white p-1.5 shadow-sm ring-1 ring-border">
+            <img
+              src="/brand/modern-science-mark.png"
+              alt=""
+              className="h-full w-full object-contain"
+            />
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-gold-dark">Modern Science Co.,Ltd.</p>
+            <h1 className="text-2xl font-bold text-navy">Explore Packages</h1>
+            <p className="text-muted-foreground text-sm">
+              Browse promotional packages ({packages.length}/20 available)
+            </p>
+          </div>
         </div>
-        
       </div>
 
       {/* Search */}
@@ -83,9 +91,17 @@ export function ExplorePage() {
               >
                 {/* Card Header */}
                 <div className={cn(
-                  'p-4',
+                  'relative overflow-hidden p-4',
                   isActive ? 'bg-navy' : 'bg-muted'
                 )}>
+                  <img
+                    src="/brand/modern-science-mark.png"
+                    alt=""
+                    className={cn(
+                      'pointer-events-none absolute -right-4 -top-7 h-28 w-28 object-contain opacity-10',
+                      !isActive && 'opacity-5'
+                    )}
+                  />
                   <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0">
                       <h3 className={cn(
@@ -186,8 +202,12 @@ export function ExplorePage() {
         </div>
       ) : (
         <div className="text-center py-16">
-          <div className="w-20 h-20 mx-auto bg-muted rounded-full flex items-center justify-center mb-4">
-            <PackageIcon className="w-10 h-10 text-muted-foreground" />
+          <div className="w-20 h-20 mx-auto bg-white rounded-xl flex items-center justify-center mb-4 p-2 shadow-sm ring-1 ring-border">
+            <img
+              src="/brand/modern-science-mark.png"
+              alt=""
+              className="h-full w-full object-contain opacity-80"
+            />
           </div>
           {searchQuery ? (
             <>
