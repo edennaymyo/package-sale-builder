@@ -139,15 +139,13 @@ export function calculatePackageTotals(pkg: Package | null, selections?: Record<
 
 export function getPackageProducts(pkg: Package): string[] {
   const products: string[] = []
-  const productLabel = (product: ProductOption) =>
-    product.shortCode ? `${product.name} (${product.shortCode})` : product.name
   
   pkg.productLines.forEach(line => {
     if (line.type === 'fixed' && line.fixedProduct?.name) {
-      products.push(productLabel(line.fixedProduct))
+      products.push(line.fixedProduct.name)
     } else if (line.type === 'or-group' && line.orOptions) {
       line.orOptions.forEach(opt => {
-        if (opt.name) products.push(productLabel(opt))
+        if (opt.name) products.push(opt.name)
       })
     }
   })

@@ -7,7 +7,8 @@ import {
   ArrowLeft,
   Package as PackageIcon,
   GripVertical,
-  AlertCircle
+  AlertCircle,
+  Edit
 } from 'lucide-react'
 import { cn, formatCurrency, formatPercent, parseCurrencyAmount } from '@/lib/utils'
 import { PRODUCT_CATALOG, findCatalogProduct } from '@/lib/productCatalog'
@@ -32,6 +33,7 @@ export function BuilderPage() {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [savedPackages, setSavedPackages] = useState<Package[]>([])
 
   useEffect(() => {
     let active = true
@@ -47,6 +49,9 @@ export function BuilderPage() {
       })
     } else {
       setPkg(createEmptyPackage())
+      fetchPackages().then(packages => {
+        if (active) setSavedPackages(packages)
+      })
     }
 
     return () => {
@@ -104,12 +109,13 @@ export function BuilderPage() {
       if (id) {
         await updatePackageRemote(pkg)
       } else {
-        await addPackageRemote(pkg)
+        const updatedPackages = await addPackageRemote(pkg)
+        setSavedPackages(updatedPackages)
       }
       
       setSaved(true)
       setTimeout(() => {
-        navigate('/explore')
+        navigate('/builder')
       }, 1000)
     } catch (error) {
       setErrors({ save: error instanceof Error ? error.message : 'Failed to save package' })
@@ -260,6 +266,32 @@ export function BuilderPage() {
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3 text-red-700">
           <AlertCircle className="w-5 h-5 flex-shrink-0" />
           <p>{errors.save}</p>
+        </div>
+      )}
+
+      {!id && savedPackages.length > 0 && (
+        <div className="bg-card rounded-xl border shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-navy mb-4 flex items-center gap-2">
+            <PackageIcon className="w-5 h-5 text-gold" />
+            Saved Packages
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {savedPackages.map(savedPackage => (
+              <button
+                key={savedPackage.id}
+                onClick={() => navigate(`/builder/${savedPackage.id}`)}
+                className="flex items-center justify-between gap-3 rounded-lg border bg-muted/30 px-4 py-3 text-left hover:border-gold hover:bg-gold/10 transition-colors"
+              >
+                <div className="min-w-0">
+                  <p className="font-medium text-navy truncate">{savedPackage.name || 'Untitled Package'}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {savedPackage.productLines.length} product line(s)
+                  </p>
+                </div>
+                <Edit className="w-4 h-4 text-gold flex-shrink-0" />
+              </button>
+            ))}
+          </div>
         </div>
       )}
 

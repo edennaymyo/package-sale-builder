@@ -20,13 +20,41 @@ import {
   calculateLineTotal,
 } from '@/lib/packages'
 
-function productMeta(product: ProductOption): string {
-  return product.shortCode || ''
-}
+const VIBER_NUMBER = '09965162112'
 
 function boxInfo(product: ProductOption): string {
   const boxLabel = product.qty === 1 ? 'box' : 'boxes'
   return `${product.qty} ${boxLabel}`
+}
+
+function reamPriceInfo(product: ProductOption): string {
+  return `${formatCurrency(product.originalPrice)} / ream`
+}
+
+function getSelectedProduct(line: ProductLine, selectedOptionId?: string): ProductOption | undefined {
+  return line.type === 'fixed'
+    ? line.fixedProduct
+    : line.orOptions?.find(option => option.id === selectedOptionId) || line.orOptions?.[0]
+}
+
+function buildOrderText(pkg: Package, selections: Record<string, string>): string {
+  const totals = calculatePackageTotals(pkg, selections)
+  const lines = pkg.productLines
+    .map((line, index) => {
+      const selected = getSelectedProduct(line, selections[line.id])
+      if (!selected) return null
+      const amount = calculateLineTotal(line, selections[line.id]).original
+      return `${index + 1}. ${selected.name}\n   ${boxInfo(selected)} x ${reamPriceInfo(selected)} = ${formatCurrency(amount)}`
+    })
+    .filter(Boolean)
+    .join('\n')
+
+  return `${pkg.name}\n\nOrder Detail:\n${lines}\n\n` +
+    `Total Amount: ${formatCurrency(totals.originalTotal)}\n` +
+    `Total Discount: ${formatCurrency(totals.discountAmount)} (${formatPercent(totals.discountPercent)})\n` +
+    `Package Price: ${formatCurrency(totals.promoTotal)}\n` +
+    `Valid: ${pkg.validFrom} to ${pkg.validTo}\n\n` +
+    `Viber: ${VIBER_NUMBER}`
 }
 
 export function PackageDetailPage() {
@@ -93,23 +121,19 @@ export function PackageDetailPage() {
 
   const shareToViber = useCallback(() => {
     if (!pkg) return
-    const pkgTotals = calculatePackageTotals(pkg, selections)
-    const text = `${pkg.name}\n\n` +
-      `Package Price: ${formatCurrency(pkgTotals.promoTotal)}\n` +
-      `Total Discount: ${formatCurrency(pkgTotals.discountAmount)} (${formatPercent(pkgTotals.discountPercent)})\n\n` +
-      `Valid: ${pkg.validFrom} to ${pkg.validTo}\n\n` +
-      `Contact Modern Science Co.,Ltd. for inquiry!`
+    const text = buildOrderText(pkg, selections)
     
     // Viber share URL
     const viberUrl = `viber://forward?text=${encodeURIComponent(text)}`
     window.open(viberUrl, '_blank')
   }, [pkg, selections])
 
-  const copyLink = useCallback(() => {
-    navigator.clipboard.writeText(window.location.href)
+  const copyOrderText = useCallback(() => {
+    if (!pkg) return
+    navigator.clipboard.writeText(buildOrderText(pkg, selections))
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
-  }, [])
+  }, [pkg, selections])
 
   if (!pkg) {
     return (
@@ -157,11 +181,11 @@ export function PackageDetailPage() {
         
         <div className="flex items-center gap-2">
           <button
-            onClick={copyLink}
+            onClick={copyOrderText}
             className="flex items-center gap-2 px-4 py-2 rounded-lg border bg-card hover:bg-muted transition-colors"
           >
             {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
-            <span className="hidden sm:inline">{copied ? 'Copied!' : 'Copy Link'}</span>
+            <span className="hidden sm:inline">{copied ? 'Copied!' : 'Copy Order'}</span>
           </button>
           <button
             onClick={shareToViber}
@@ -243,9 +267,7 @@ export function PackageDetailPage() {
                   Package Includes:
                 </p>
                 {pkg.productLines.map((line, idx) => {
-                  const selected = line.type === 'fixed' 
-                    ? line.fixedProduct 
-                    : line.orOptions?.find(o => o.id === selections[line.id]) || line.orOptions?.[0]
+                  const selected = getSelectedProduct(line, selections[line.id])
                   
                   if (!selected) return null
                   
@@ -259,13 +281,8 @@ export function PackageDetailPage() {
                         </span>
                         <div>
                           <p className="font-medium text-sm">{selected.name}</p>
-                          {productMeta(selected) && (
-                            <p className="text-xs text-muted-foreground">
-                              {productMeta(selected)}
-                            </p>
-                          )}
-                          <p className="text-xs text-muted-foreground">
-                            {boxInfo(selected)}
+                          <p className="text-sm font-semibold text-navy">
+                            {boxInfo(selected)} <span className="text-xs font-normal text-muted-foreground">x {reamPriceInfo(selected)}</span>
                             {line.type === 'or-group' && (
                               <span className="text-gold ml-1">(or choice)</span>
                             )}
@@ -274,7 +291,7 @@ export function PackageDetailPage() {
                       </div>
                       <div className="text-right">
                         <p className="text-xs text-muted-foreground">Amount</p>
-                        <p className="font-semibold text-gold">{formatCurrency(lineTotal.original)}</p>
+                        <p className="text-lg font-bold text-gold">{formatCurrency(lineTotal.original)}</p>
                       </div>
                     </div>
                   )
@@ -309,7 +326,7 @@ export function PackageDetailPage() {
 
               {/* CTA */}
               <div className="bg-gold text-navy text-center py-3 rounded-lg font-semibold">
-                Contact us on Viber for inquiry!
+                Contact us on Viber: {VIBER_NUMBER}
               </div>
             </div>
           </div>
@@ -339,19 +356,17 @@ function ProductLineCard({ line, index, selectedOptionId, onSelectOption }: Prod
             </span>
             <div>
               <p className="font-medium">{line.fixedProduct.name}</p>
-              {productMeta(line.fixedProduct) && (
-                <p className="text-xs text-muted-foreground">
-                  {productMeta(line.fixedProduct)}
-                </p>
-              )}
-              <p className="text-sm text-muted-foreground">
+              <p className="text-base font-semibold text-navy">
                 {boxInfo(line.fixedProduct)}
+                <span className="ml-2 text-sm font-normal text-muted-foreground">
+                  x {reamPriceInfo(line.fixedProduct)}
+                </span>
               </p>
             </div>
           </div>
           <div className="text-right">
             <p className="text-xs text-muted-foreground">Amount</p>
-            <p className="font-bold text-gold">{formatCurrency(lineTotal.original)}</p>
+            <p className="text-xl font-bold text-gold">{formatCurrency(lineTotal.original)}</p>
           </div>
         </div>
       </div>
@@ -399,20 +414,18 @@ function ProductLineCard({ line, index, selectedOptionId, onSelectOption }: Prod
                   </div>
                   <div>
                     <p className="font-medium">{option.name}</p>
-                    {productMeta(option) && (
-                      <p className="text-xs text-muted-foreground">
-                        {productMeta(option)}
-                      </p>
-                    )}
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-base font-semibold text-navy">
                       {boxInfo(option)}
+                      <span className="ml-2 text-sm font-normal text-muted-foreground">
+                        x {reamPriceInfo(option)}
+                      </span>
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
                   <p className="text-xs text-muted-foreground">Amount</p>
                   <p className={cn(
-                    'font-bold',
+                    'text-xl font-bold',
                     isSelected ? 'text-gold' : 'text-muted-foreground'
                   )}>
                     {formatCurrency(optTotal)}
