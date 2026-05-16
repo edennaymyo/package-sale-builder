@@ -56,6 +56,24 @@ function buildOrderText(pkg: Package, selections: Record<string, string>): strin
     `Viber: ${VIBER_NUMBER}`
 }
 
+function buildViberForwardText(pkg: Package, selections: Record<string, string>): string {
+  const totals = calculatePackageTotals(pkg, selections)
+  const lines = pkg.productLines
+    .map((line, index) => {
+      const selected = getSelectedProduct(line, selections[line.id])
+      if (!selected) return null
+      const productName = selected.shortCode || selected.name
+      return `${index + 1}) ${productName} ${selected.qty}bx@${formatCurrency(selected.originalPrice)}`
+    })
+    .filter(Boolean)
+    .join('\n')
+
+  return `${pkg.name}\n${lines}\n` +
+    `T:${formatCurrency(totals.originalTotal)} ` +
+    `D:${formatCurrency(totals.discountAmount)} ` +
+    `P:${formatCurrency(totals.promoTotal)}`
+}
+
 export function PackageDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
@@ -119,11 +137,12 @@ export function PackageDetailPage() {
 
   const shareToViber = useCallback(() => {
     if (!pkg) return
-    const text = buildOrderText(pkg, selections)
-    navigator.clipboard?.writeText(text).catch(() => undefined)
+    const clipboardText = buildOrderText(pkg, selections)
+    const viberText = buildViberForwardText(pkg, selections)
+    navigator.clipboard?.writeText(clipboardText).catch(() => undefined)
     
     // Viber share URL
-    const viberUrl = `viber://forward?text=${encodeURIComponent(text)}`
+    const viberUrl = `viber://forward?text=${encodeURIComponent(viberText)}`
     window.open(viberUrl, '_blank')
   }, [pkg, selections])
 
