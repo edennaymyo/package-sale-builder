@@ -7,8 +7,6 @@ import {
   Calendar,
   Download,
   MessageCircle,
-  Check,
-  Copy
 } from 'lucide-react'
 import { cn, formatCurrency, formatPercent } from '@/lib/utils'
 import {
@@ -64,7 +62,6 @@ export function PackageDetailPage() {
   const [pkg, setPkg] = useState<Package | null>(null)
   const [selections, setSelections] = useState<Record<string, string>>({})
   const [generating, setGenerating] = useState(false)
-  const [copied, setCopied] = useState(false)
   const cardRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -129,13 +126,6 @@ export function PackageDetailPage() {
     window.open(viberUrl, '_blank')
   }, [pkg, selections])
 
-  const copyOrderText = useCallback(() => {
-    if (!pkg) return
-    navigator.clipboard.writeText(buildOrderText(pkg, selections))
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }, [pkg, selections])
-
   if (!pkg) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -178,33 +168,6 @@ export function PackageDetailPage() {
               </span>
             </div>
           </div>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <button
-            onClick={copyOrderText}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg border bg-card hover:bg-muted transition-colors"
-          >
-            {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
-            <span className="hidden sm:inline">{copied ? 'Copied!' : 'Copy Order'}</span>
-          </button>
-          <button
-            onClick={shareToViber}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#7360f2] text-white hover:bg-[#6050d2] transition-colors"
-          >
-            <MessageCircle className="w-4 h-4" />
-            <span className="hidden sm:inline">Viber</span>
-          </button>
-          <button
-            onClick={generateImage}
-            disabled={generating}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gold text-navy hover:bg-gold-dark transition-colors disabled:opacity-50"
-          >
-            <Download className="w-4 h-4" />
-            <span className="hidden sm:inline">
-              {generating ? 'Generating...' : 'Download Card'}
-            </span>
-          </button>
         </div>
       </div>
 
@@ -333,6 +296,24 @@ export function PackageDetailPage() {
                 Contact us on Viber: {VIBER_NUMBER}
               </a>
             </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" style={{ maxWidth: '400px' }}>
+            <button
+              onClick={shareToViber}
+              className="flex items-center justify-center gap-2 rounded-lg bg-[#7360f2] px-4 py-3 text-sm font-semibold text-white hover:bg-[#6050d2] transition-colors"
+            >
+              <MessageCircle className="w-5 h-5" />
+              Order via Viber
+            </button>
+            <button
+              onClick={generateImage}
+              disabled={generating}
+              className="flex items-center justify-center gap-2 rounded-lg bg-gold px-4 py-3 text-sm font-semibold text-navy hover:bg-gold-dark transition-colors disabled:opacity-50"
+            >
+              <Download className="w-5 h-5" />
+              {generating ? 'Saving...' : 'Save order image'}
+            </button>
           </div>
         </div>
       </div>
