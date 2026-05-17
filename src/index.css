@@ -99,6 +99,42 @@
   animation: choice-shake 0.45s ease-in-out 0.35s 2;
 }
 
+.choice-select-nudge {
+  animation: choice-select-float 3.2s ease-in-out 0.4s 2, choice-select-pulse 3.2s ease-in-out 0.4s 2;
+}
+
+.choice-pointer-bounce {
+  display: inline-block;
+  animation: choice-pointer-bounce 1.8s ease-in-out 0.3s 4;
+}
+
+@keyframes choice-select-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes choice-pointer-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(4px);
+  }
+}
+
+@keyframes choice-select-pulse {
+  0%, 100% {
+    box-shadow: 0 1px 2px rgb(15 23 42 / 0.08);
+  }
+  50% {
+    box-shadow: 0 0 0 3px rgb(176 138 52 / 0.11), 0 8px 22px rgb(176 138 52 / 0.13);
+  }
+}
+
 .discount-badge {
   position: relative;
   transform-origin: center;
@@ -171,6 +207,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .animate-choice-shake,
+  .choice-select-nudge,
+  .choice-pointer-bounce,
   .discount-badge,
   .discount-badge--shine::after,
   .discount-badge--wiggle .discount-badge__icon {

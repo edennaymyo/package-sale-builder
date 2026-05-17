@@ -4,6 +4,7 @@ import { toPng } from 'html-to-image'
 import {
   ArrowLeft,
   Calendar,
+  ChevronDown,
   Download,
   MessageCircle,
 } from 'lucide-react'
@@ -318,66 +319,54 @@ function ShareCardLine({ line, index, selectedOptionId, onSelectOption }: ShareC
   }
 
   if (line.type === 'or-group' && line.orOptions) {
+    const selectedOption = line.orOptions.find(option => option.id === selectedOptionId) || line.orOptions[0]
+    const selectedTotal = selectedOption
+      ? calculateLineTotal({
+        id: line.id,
+        type: 'or-group',
+        orOptions: [selectedOption],
+      }, selectedOption.id).original
+      : 0
+
     return (
-      <div className="animate-choice-shake border-b py-3 last:border-0">
+      <div className="border-b py-3 last:border-0">
         <div className="mb-2 flex items-center gap-2">
           <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-gold text-xs font-bold text-navy">
             {index + 1}
           </span>
           <span className="rounded-full bg-gold/15 px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-gold-dark">
-            Choose one option
+            ဒါကရွေးလို့ရတယ်နော် <span className="choice-pointer-bounce">👇</span>
           </span>
         </div>
 
-        <div className="space-y-2">
-          {line.orOptions.map(option => {
-            const isSelected = selectedOptionId === option.id || (!selectedOptionId && line.orOptions?.[0]?.id === option.id)
-            const optTotal = calculateLineTotal({
-              id: line.id,
-              type: 'or-group',
-              orOptions: [option],
-            }, option.id).original
-            
-            return (
-              <button
-                key={option.id}
-                onClick={() => onSelectOption(option.id)}
-                className={cn(
-                  'w-full rounded-lg border-2 p-3 text-left transition-all',
-                  isSelected
-                    ? 'border-gold bg-gold/10 shadow-sm ring-2 ring-gold/20'
-                    : 'border-border bg-white hover:border-gold/50 hover:bg-gold/5'
-                )}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex min-w-0 items-start gap-2">
-                    <span className={cn(
-                      'mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border-2',
-                      isSelected ? 'border-gold bg-white' : 'border-muted-foreground/30'
-                    )}>
-                      {isSelected && <span className="h-2.5 w-2.5 rounded-full bg-gold" />}
-                    </span>
-                    <div className="min-w-0">
-                      <p className="truncate whitespace-nowrap text-sm font-semibold text-navy">{option.name}</p>
-                      <p className="text-sm font-semibold text-navy">
-                        {boxInfo(option)}
-                        <span className="text-xs font-normal text-muted-foreground"> x {reamPriceInfo(option)}</span>
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex-shrink-0 text-right">
-                    <p className="text-xs text-muted-foreground">Amount</p>
-                    <p className={cn(
-                      'text-base font-bold',
-                      isSelected ? 'text-gold' : 'text-muted-foreground'
-                    )}>
-                      {formatCurrency(optTotal)}
-                    </p>
-                  </div>
-                </div>
-              </button>
-            )
-          })}
+        <div className="choice-select-nudge rounded-lg border-2 border-gold/60 bg-gold/10 p-3 shadow-sm ring-2 ring-gold/15">
+          <div className="relative">
+            <select
+              value={selectedOption?.id || ''}
+              onChange={event => onSelectOption(event.target.value)}
+              className="w-full appearance-none rounded-md border border-gold/40 bg-white py-2.5 pl-3 pr-10 text-sm font-semibold text-navy shadow-inner outline-none transition-colors focus:border-gold focus:ring-2 focus:ring-gold/25"
+            >
+              {line.orOptions.map(option => (
+                <option key={option.id} value={option.id}>
+                  {option.name} - {boxInfo(option)} x {reamPriceInfo(option)}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gold-dark" />
+          </div>
+
+          {selectedOption && (
+            <div className="mt-3 flex items-end justify-between gap-3">
+              <p className="min-w-0 text-sm font-semibold text-navy">
+                {boxInfo(selectedOption)}
+                <span className="text-xs font-normal text-muted-foreground"> x {reamPriceInfo(selectedOption)}</span>
+              </p>
+              <div className="flex-shrink-0 text-right">
+                <p className="text-xs text-muted-foreground">Amount</p>
+                <p className="text-base font-bold text-gold">{formatCurrency(selectedTotal)}</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     )
