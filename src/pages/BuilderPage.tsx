@@ -9,6 +9,7 @@ import {
   GripVertical,
   AlertCircle,
   Edit,
+  RefreshCw,
   ChevronUp,
   ChevronDown
 } from 'lucide-react'
@@ -28,6 +29,7 @@ import {
   deletePackageRemote,
   calculatePackageTotals,
 } from '@/lib/packages'
+import { fetchOdooPrice } from '@/lib/odooPrice'
 
 export function BuilderPage() {
   const { id } = useParams()
@@ -614,10 +616,61 @@ interface ProductInputProps {
 function ProductInput({ product, onChange, error, onRemove }: ProductInputProps) {
   const [query, setQuery] = useState(product.name)
   const [showHints, setShowHints] = useState(false)
+  const [priceLoading, setPriceLoading] = useState(false)
+  const [priceMessage, setPriceMessage] = useState('')
+  const [priceStatus, setPriceStatus] = useState<'idle' | 'success' | 'error'>('idle')
 
   useEffect(() => {
     setQuery(product.name)
   }, [product.name])
+
+  const refreshOdooPrice = async (mode: 'auto' | 'manual' = 'manual') => {
+    if (!product.name.trim()) {
+      setPriceStatus('error')
+      setPriceMessage('Choose product first')
+      return
+    }
+
+    setPriceLoading(true)
+    setPriceStatus('idle')
+    setPriceMessage(mode === 'auto' ? '' : 'Loading Odoo price...')
+
+    try {
+      const result = await fetchOdooPrice(product)
+      const reamPrice = Math.round(result.reamPrice)
+      onChange({
+        originalPrice: reamPrice,
+        promoPrice: reamPrice,
+        odooProductId: result.productId,
+        odooProductName: result.productName,
+        odooBoxPrice: result.boxPrice,
+        odooPriceMinQuantity: result.minQuantity,
+        odooPriceRule: result.rule,
+        odooPriceUpdatedAt: new Date().toISOString(),
+      })
+      setPriceStatus('success')
+      setPriceMessage(
+        result.rule === 'round-down'
+          ? `Odoo box price ${formatCurrency(result.boxPrice)} loaded (${formatCurrency(reamPrice)} / ream)`
+          : `Odoo nearest min box price ${formatCurrency(result.boxPrice)} loaded (${formatCurrency(reamPrice)} / ream)`
+      )
+    } catch (error) {
+      setPriceStatus('error')
+      setPriceMessage(error instanceof Error ? error.message : 'Odoo price not found')
+    } finally {
+      setPriceLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if (!product.shortCode) return
+
+    const timeoutId = window.setTimeout(() => {
+      refreshOdooPrice('auto')
+    }, 450)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [product.shortCode, product.qty, product.reamsPerBox, product.name])
 
   const matchingProducts = PRODUCT_CATALOG.filter(item => {
     const search = query.trim().toLowerCase()
@@ -720,7 +773,24 @@ function ProductInput({ product, onChange, error, onRemove }: ProductInputProps)
             placeholder="Ream price"
             className="w-full px-3 py-2 text-sm rounded-lg border bg-background focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none transition-all"
           />
+          {priceMessage && (
+            <p className={cn(
+              'mt-1 text-xs',
+              priceStatus === 'success' ? 'text-green-600' : 'text-red-500'
+            )}>
+              {priceMessage}
+            </p>
+          )}
         </div>
+        <button
+          type="button"
+          onClick={() => refreshOdooPrice('manual')}
+          disabled={priceLoading || !product.name.trim()}
+          title="Reload price from Odoo"
+          className="mt-0.5 rounded-lg border border-gold/30 bg-gold/10 p-2 text-gold-dark transition-colors hover:bg-gold/20 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <RefreshCw className={cn('h-4 w-4', priceLoading && 'animate-spin')} />
+        </button>
         
         {onRemove && (
           <button

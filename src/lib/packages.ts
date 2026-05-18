@@ -6,6 +6,12 @@ export interface ProductOption {
   name: string
   shortCode?: string
   reamsPerBox?: number
+  odooProductId?: number
+  odooProductName?: string
+  odooBoxPrice?: number
+  odooPriceMinQuantity?: number
+  odooPriceRule?: 'round-down' | 'nearest-minimum'
+  odooPriceUpdatedAt?: string
   qty: number
   originalPrice: number
   promoPrice: number
