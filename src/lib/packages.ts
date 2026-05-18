@@ -28,6 +28,7 @@ export interface Package {
   id: string
   name: string
   description: string
+  isActive?: boolean
   validFrom: string
   validTo: string
   totalDiscount?: number
@@ -59,6 +60,7 @@ export function createEmptyPackage(): Package {
     id: uuidv4(),
     name: '',
     description: '',
+    isActive: true,
     validFrom: new Date().toISOString().split('T')[0],
     validTo: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     totalDiscount: 0,
@@ -164,6 +166,15 @@ const API_ENDPOINT = '/api/packages'
 
 function isLocalDevHost(): boolean {
   return ['localhost', '127.0.0.1', '0.0.0.0'].includes(window.location.hostname)
+}
+
+export type PackageStatus = 'active' | 'inactive' | 'expired'
+
+export function getPackageStatus(pkg: Package): PackageStatus {
+  if (pkg.isActive === false) return 'inactive'
+
+  const today = new Date().toISOString().split('T')[0]
+  return pkg.validFrom <= today && pkg.validTo >= today ? 'active' : 'expired'
 }
 
 function normalizeProduct(product: ProductOption): ProductOption {

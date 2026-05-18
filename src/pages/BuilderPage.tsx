@@ -14,7 +14,7 @@ import {
   ChevronDown
 } from 'lucide-react'
 import { cn, formatCurrency, formatPercent, parseCurrencyAmount } from '@/lib/utils'
-import { PRODUCT_CATALOG, findCatalogProduct } from '@/lib/productCatalog'
+import { findCatalogProduct, getCatalogProducts } from '@/lib/productCatalog'
 import {
   Package,
   ProductLine,
@@ -28,6 +28,7 @@ import {
   updatePackageRemote,
   deletePackageRemote,
   calculatePackageTotals,
+  getPackageStatus,
 } from '@/lib/packages'
 import { fetchOdooPrice } from '@/lib/odooPrice'
 
@@ -66,6 +67,7 @@ export function BuilderPage() {
   }, [id, navigate])
 
   const totals = calculatePackageTotals(pkg)
+  const packageStatus = getPackageStatus(pkg)
 
   const validatePackage = (): boolean => {
     const newErrors: Record<string, string> = {}
@@ -429,6 +431,35 @@ export function BuilderPage() {
                   />
                 </div>
               </div>
+
+              <div className="rounded-lg border bg-muted/30 p-3">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <label className="block text-sm font-medium">Package Status</label>
+                    <p className="text-xs text-muted-foreground">
+                      Date expired packages show as Expired automatically.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={cn(
+                      'rounded-full px-2.5 py-1 text-xs font-semibold',
+                      packageStatus === 'active'
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-red-100 text-red-700'
+                    )}>
+                      {packageStatus === 'active' ? 'Active' : packageStatus === 'expired' ? 'Expired' : 'Inactive'}
+                    </span>
+                    <select
+                      value={pkg.isActive === false ? 'inactive' : 'active'}
+                      onChange={event => setPkg(prev => ({ ...prev, isActive: event.target.value === 'active' }))}
+                      className="rounded-lg border bg-background px-3 py-2 text-sm font-medium outline-none focus:border-gold focus:ring-2 focus:ring-gold/40"
+                    >
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -672,7 +703,7 @@ function ProductInput({ product, onChange, error, onRemove }: ProductInputProps)
     return () => window.clearTimeout(timeoutId)
   }, [product.shortCode, product.qty, product.reamsPerBox, product.name])
 
-  const matchingProducts = PRODUCT_CATALOG.filter(item => {
+  const matchingProducts = getCatalogProducts().filter(item => {
     const search = query.trim().toLowerCase()
     if (!search) return true
     return item.name.toLowerCase().includes(search) || item.shortCode.toLowerCase().includes(search)

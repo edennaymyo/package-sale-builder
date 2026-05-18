@@ -4,6 +4,7 @@ import {
   Search, 
   Calendar, 
   Eye,
+  ArrowDownUp,
 } from 'lucide-react'
 import { cn, formatCurrency } from '@/lib/utils'
 import { DiscountBadge } from '@/components/DiscountBadge'
@@ -12,21 +13,32 @@ import {
   fetchPackages,
   calculatePackageTotals,
   getPackageProducts,
+  getPackageStatus,
 } from '@/lib/packages'
+
+type SortKey = 'discountPercent' | 'discountAmount' | 'totalAmount' | 'productLines'
+type SortDirection = 'desc' | 'asc'
+
+const SORT_LABELS: Record<SortKey, string> = {
+  discountPercent: 'Discount %',
+  discountAmount: 'Discount Amount',
+  totalAmount: 'Total Amount',
+  productLines: 'Product Lines',
+}
 
 export function ExplorePage() {
   const [packages, setPackages] = useState<Package[]>([])
   const [searchQuery, setSearchQuery] = useState('')
+  const [sortKey, setSortKey] = useState<SortKey>('discountPercent')
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
 
   useEffect(() => {
     fetchPackages().then(setPackages)
   }, [])
 
-  const filteredPackages = useMemo(() => {
-    if (!searchQuery.trim()) return packages
-    
+  const visiblePackages = useMemo(() => {
     const query = searchQuery.toLowerCase()
-    return packages.filter(pkg => {
+    const filtered = searchQuery.trim() ? packages.filter(pkg => {
       // Search in package name and description
       if (pkg.name.toLowerCase().includes(query)) return true
       if (pkg.description.toLowerCase().includes(query)) return true
@@ -34,13 +46,21 @@ export function ExplorePage() {
       // Search in product names
       const products = getPackageProducts(pkg)
       return products.some(p => p.toLowerCase().includes(query))
-    })
-  }, [packages, searchQuery])
+    }) : packages
 
-  const isPackageActive = (pkg: Package): boolean => {
-    const today = new Date().toISOString().split('T')[0]
-    return pkg.validFrom <= today && pkg.validTo >= today
-  }
+    return [...filtered].sort((a, b) => {
+      const aTotals = calculatePackageTotals(a)
+      const bTotals = calculatePackageTotals(b)
+      const values: Record<SortKey, [number, number]> = {
+        discountPercent: [aTotals.discountPercent, bTotals.discountPercent],
+        discountAmount: [aTotals.discountAmount, bTotals.discountAmount],
+        totalAmount: [aTotals.originalTotal, bTotals.originalTotal],
+        productLines: [a.productLines.length, b.productLines.length],
+      }
+      const [aValue, bValue] = values[sortKey]
+      return sortDirection === 'desc' ? bValue - aValue : aValue - bValue
+    })
+  }, [packages, searchQuery, sortDirection, sortKey])
 
   return (
     <div className="space-y-6">
@@ -64,24 +84,48 @@ export function ExplorePage() {
         </div>
       </div>
 
-      {/* Search */}
-      <div className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
-          placeholder="Search by package name or product..."
-          className="w-full pl-12 pr-4 py-3 rounded-xl border bg-card shadow-sm focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none transition-all"
-        />
+      {/* Search & Sort */}
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_auto]">
+        <div className="relative">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            placeholder="Search by package name or product..."
+            className="w-full pl-12 pr-4 py-3 rounded-xl border bg-card shadow-sm focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none transition-all"
+          />
+        </div>
+        <div className="flex items-center gap-2 rounded-xl border bg-card p-2 shadow-sm">
+          <ArrowDownUp className="h-4 w-4 text-gold-dark" />
+          <label className="sr-only" htmlFor="package-sort">Sort packages</label>
+          <select
+            id="package-sort"
+            value={sortKey}
+            onChange={event => setSortKey(event.target.value as SortKey)}
+            className="min-w-[168px] rounded-lg border bg-background px-3 py-2 text-sm font-medium text-navy outline-none focus:border-gold focus:ring-2 focus:ring-gold/40"
+          >
+            {(Object.keys(SORT_LABELS) as SortKey[]).map(key => (
+              <option key={key} value={key}>{SORT_LABELS[key]}</option>
+            ))}
+          </select>
+          <button
+            type="button"
+            onClick={() => setSortDirection(prev => prev === 'desc' ? 'asc' : 'desc')}
+            className="rounded-lg bg-gold/10 px-3 py-2 text-sm font-semibold text-gold-dark transition-colors hover:bg-gold/20"
+          >
+            {sortDirection === 'desc' ? 'High' : 'Low'}
+          </button>
+        </div>
       </div>
 
       {/* Package Grid */}
-      {filteredPackages.length > 0 ? (
+      {visiblePackages.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredPackages.map(pkg => {
+          {visiblePackages.map(pkg => {
             const totals = calculatePackageTotals(pkg)
-            const isActive = isPackageActive(pkg)
+            const status = getPackageStatus(pkg)
+            const isActive = status === 'active'
             const products = getPackageProducts(pkg)
             
             return (
@@ -119,11 +163,11 @@ export function ExplorePage() {
                     </div>
                     <span className={cn(
                       'px-2 py-1 text-xs font-medium rounded-full',
-                      isActive
-                        ? 'bg-gold text-navy'
-                        : 'bg-muted-foreground/20 text-muted-foreground'
+                      status === 'active'
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-red-100 text-red-700'
                     )}>
-                      {isActive ? 'Active' : 'Inactive'}
+                      {status === 'active' ? 'Active' : status === 'expired' ? 'Expired' : 'Inactive'}
                     </span>
                   </div>
                 </div>

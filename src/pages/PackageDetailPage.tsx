@@ -16,6 +16,7 @@ import {
   fetchPackageById,
   calculatePackageTotals,
   calculateLineTotal,
+  getPackageStatus,
 } from '@/lib/packages'
 
 const VIBER_NUMBER = '09965162112'
@@ -156,10 +157,7 @@ export function PackageDetailPage() {
   }
 
   const totals = calculatePackageTotals(pkg, selections)
-  const isActive = (() => {
-    const today = new Date().toISOString().split('T')[0]
-    return pkg.validFrom <= today && pkg.validTo >= today
-  })()
+  const packageStatus = getPackageStatus(pkg)
 
   return (
     <div className="space-y-6">
@@ -177,11 +175,11 @@ export function PackageDetailPage() {
             <div className="flex items-center gap-3 mt-1">
               <span className={cn(
                 'px-2 py-0.5 text-xs font-medium rounded-full',
-                isActive
+                packageStatus === 'active'
                   ? 'bg-green-100 text-green-700'
-                  : 'bg-muted text-muted-foreground'
+                  : 'bg-red-100 text-red-700'
               )}>
-                {isActive ? 'Active' : 'Expired'}
+                {packageStatus === 'active' ? 'Active' : packageStatus === 'expired' ? 'Expired' : 'Inactive'}
               </span>
               <span className="text-sm text-muted-foreground flex items-center gap-1">
                 <Calendar className="w-4 h-4" />
